@@ -46,7 +46,7 @@
             min-height: 100vh;
             padding: 20px;
             transition: background-color 0.3s ease, color 0.3s ease;
-            background-image: url('https://images.unsplash.com/photo-1507838125556-c7fd433a571b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-image: url('https://images.unsplash.com/photo-1470225661839-af8c6453b342?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -149,7 +149,7 @@
             font-size: 1.5rem;
             margin: 0;
         }
-        .settings-btn, .back-btn {
+        .settings-btn, .back-btn, .add-to-playlist-btn {
             background: none;
             border: none;
             color: var(--primary-color);
@@ -157,7 +157,7 @@
             cursor: pointer;
             transition: color 0.2s;
         }
-        .settings-btn:hover, .back-btn:hover {
+        .settings-btn:hover, .back-btn:hover, .add-to-playlist-btn:hover {
             color: #455a9b;
         }
         .content-list {
@@ -224,7 +224,11 @@
             margin: 0;
             color: var(--secondary-text-color);
         }
-        .song-card .remove-btn {
+        .song-card .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .song-card .remove-btn, .song-card .add-btn {
             background: none;
             border: none;
             color: var(--secondary-text-color);
@@ -233,7 +237,7 @@
             opacity: 0.7;
             margin-right: 10px;
         }
-        .song-card .remove-btn:hover {
+        .song-card .remove-btn:hover, .song-card .add-btn:hover {
             color: #d32f2f;
             opacity: 1;
         }
@@ -267,7 +271,7 @@
             margin-bottom: 5px;
             color: var(--primary-color);
         }
-        .file-upload-btn {
+        .file-upload-btn, .create-playlist-btn {
             background-color: var(--primary-color);
             color: white;
             padding: 10px 20px;
@@ -276,7 +280,7 @@
             transition: background-color 0.2s;
             text-align: center;
         }
-        .file-upload-btn:hover {
+        .file-upload-btn:hover, .create-playlist-btn:hover {
             background-color: #455a9b;
         }
         #search-box {
@@ -389,6 +393,19 @@
             -ms-transform: translateX(20px);
             transform: translateX(20px);
         }
+        .about-us {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--secondary-text-color);
+            padding: 15px;
+            background-color: var(--background-color);
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .about-us h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
         .bottom-nav {
             display: flex;
             justify-content: space-around;
@@ -431,16 +448,23 @@
             transition: transform 0.3s ease-in-out;
             z-index: 25;
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
         }
         .player-bar.visible {
             transform: translateY(0);
         }
         .player-bar-content {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            flex-grow: 1;
+        }
+        .player-bar .song-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            margin-left: 15px;
         }
         .player-bar .song-info {
             flex-grow: 1;
@@ -448,6 +472,8 @@
             flex-direction: column;
             align-items: flex-start;
             text-align: right;
+            overflow: hidden;
+            white-space: nowrap;
         }
         .player-bar .song-info h4 {
             font-size: 1rem;
@@ -455,7 +481,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            width: 150px;
+            width: 100%;
         }
         .player-bar .song-info p {
             font-size: 0.8rem;
@@ -473,15 +499,101 @@
             border: none;
             cursor: pointer;
         }
-        .player-bar .progress-bar-container {
+        #now-playing-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            gap: 20px;
+        }
+        #now-playing-page .header {
             width: 100%;
-            height: 4px;
-            background-color: #ddd;
+            justify-content: flex-end;
+        }
+        #now-playing-page .song-image-large {
+            width: 250px;
+            height: 250px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        #now-playing-page h2 {
+            font-size: 1.8rem;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #now-playing-page p {
+            font-size: 1.2rem;
+            color: var(--secondary-text-color);
+            margin: 0;
+        }
+        #now-playing-page .controls {
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 20px;
+        }
+        #now-playing-page .controls button {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 2rem;
             cursor: pointer;
         }
-        .player-bar .progress-bar {
+        #now-playing-page .controls .main-control-btn {
+            font-size: 3.5rem;
+        }
+        #now-playing-page .progress-container {
+            width: 100%;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #now-playing-page .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background-color: #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+        body.dark-mode #now-playing-page .progress-bar-container {
+            background-color: #555;
+        }
+        #now-playing-page .progress-bar {
             height: 100%;
             background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+        #now-playing-page .time-display {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--secondary-text-color);
+        }
+        #now-playing-page .extra-controls {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 20px;
+        }
+        #now-playing-page .extra-controls button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--secondary-text-color);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        #now-playing-page .extra-controls button.active {
+            color: var(--primary-color);
         }
     </style>
 </head>
@@ -524,16 +636,31 @@
                 <ul id="playlist" class="content-list"></ul>
             </div>
             <div id="artists-page" class="page hidden">
-                <h1>الفنانون</h1>
+                <div class="header">
+                    <button class="back-btn" id="back-from-artists-btn" title="العودة"><i class="fas fa-arrow-right"></i></button>
+                    <h1>الفنانون</h1>
+                    <div></div>
+                </div>
                 <ul id="artists-list" class="content-list"></ul>
             </div>
             <div id="albums-page" class="page hidden">
-                <h1>الألبومات</h1>
+                <div class="header">
+                    <button class="back-btn" id="back-from-albums-btn" title="العودة"><i class="fas fa-arrow-right"></i></button>
+                    <h1>الألبومات</h1>
+                    <div></div>
+                </div>
                 <ul id="albums-list" class="content-list"></ul>
             </div>
             <div id="playlists-page" class="page hidden">
-                <h1>قوائم التشغيل</h1>
-                <p style="text-align: center; font-size: 0.9rem; color: var(--secondary-text-color);">هذه الميزة تحت الإنشاء. يمكنك استخدام قائمة التشغيل الرئيسية حاليًا.</p>
+                <div class="header">
+                    <button class="back-btn" id="back-from-playlists-btn" title="العودة"><i class="fas fa-arrow-right"></i></button>
+                    <h1>قوائم التشغيل</h1>
+                    <button class="create-playlist-btn" id="create-playlist-btn">
+                        <i class="fas fa-plus"></i>
+                        <span>إنشاء</span>
+                    </button>
+                </div>
+                <ul id="playlists-list" class="content-list"></ul>
             </div>
             <div id="settings-page" class="page hidden">
                 <div class="header">
@@ -550,26 +677,66 @@
                         </label>
                     </div>
                     <div class="setting-item">
+                        <label for="sleep-timer-select">مؤقت الإيقاف</label>
+                        <select id="sleep-timer-select" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+                            <option value="0">إيقاف</option>
+                            <option value="5">5 دقائق</option>
+                            <option value="15">15 دقيقة</option>
+                            <option value="30">30 دقيقة</option>
+                            <option value="60">60 دقيقة</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
                         <label>إعادة تعيين البيانات</label>
                         <button id="reset-data-btn">مسح وحفظ</button>
                     </div>
+                    <div class="about-us">
+                        <h3>من نحن</h3>
+                        <p>تطبيق مشغل موسيقى بسيط وعملي، تم تطويره بواسطة:</p>
+                        <p><strong>حازم أحمد</strong></p>
+                    </div>
+                </div>
+            </div>
+            <div id="now-playing-page" class="page hidden">
+                <div class="header">
+                    <button class="back-btn" id="back-from-now-playing-btn" title="العودة"><i class="fas fa-chevron-down"></i></button>
+                    <div></div>
+                </div>
+                <img src="https://i.imgur.com/u7q6K6e.png" id="now-playing-image" alt="Album Art" class="song-image-large">
+                <div class="song-info">
+                    <h2 id="now-playing-title">لا يوجد أغنية قيد التشغيل</h2>
+                    <p id="now-playing-artist">غير معروف</p>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar-container" id="full-progress-bar-container">
+                        <div class="progress-bar" id="full-progress-bar"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="current-time">0:00</span>
+                        <span id="total-time">0:00</span>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button id="full-player-prev-btn"><i class="fas fa-backward"></i></button>
+                    <button id="full-player-play-pause-btn" class="main-control-btn"><i class="fas fa-play"></i></button>
+                    <button id="full-player-next-btn"><i class="fas fa-forward"></i></button>
+                </div>
+                <div class="extra-controls">
+                    <button id="repeat-btn" title="تكرار"><i class="fas fa-redo"></i></button>
+                    <button id="shuffle-btn" title="تشغيل عشوائي"><i class="fas fa-shuffle"></i></button>
                 </div>
             </div>
         </div>
         <div class="player-bar" id="player-bar">
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="player-bar-progress"></div>
-            </div>
             <div class="player-bar-content">
+                <img src="https://i.imgur.com/u7q6K6e.png" id="player-bar-image" class="song-image" alt="Album Art">
                 <div class="song-info">
                     <h4 id="player-bar-title"></h4>
                     <p id="player-bar-artist"></p>
                 </div>
-                <div class="controls">
-                    <button id="player-bar-prev-btn" title="السابق"><i class="fas fa-backward"></i></button>
-                    <button id="player-bar-play-pause-btn" title="تشغيل/إيقاف"><i class="fas fa-play"></i></button>
-                    <button id="player-bar-next-btn" title="التالي"><i class="fas fa-forward"></i></button>
-                </div>
+            </div>
+            <div class="controls">
+                <button id="player-bar-play-pause-btn" title="تشغيل/إيقاف"><i class="fas fa-play"></i></button>
             </div>
         </div>
         <div class="bottom-nav">
@@ -600,6 +767,8 @@
         const sectionBtns = document.querySelectorAll('.section-btn');
         const openSettingsBtn = document.getElementById('open-settings-btn');
         const backFromSettingsBtn = document.getElementById('back-from-settings-btn');
+        const backFromPlaylistsBtn = document.getElementById('back-from-playlists-btn');
+        const createPlaylistBtn = document.getElementById('create-playlist-btn');
         const fileInput = document.getElementById('file-input');
         const audioPlayer = document.getElementById('audio-player');
         const playlistEl = document.getElementById('playlist');
@@ -609,18 +778,36 @@
         const resetDataBtn = document.getElementById('reset-data-btn');
         const artistsListEl = document.getElementById('artists-list');
         const albumsListEl = document.getElementById('albums-list');
+        const playlistsListEl = document.getElementById('playlists-list');
         const playerBar = document.getElementById('player-bar');
         const playerBarTitleEl = document.getElementById('player-bar-title');
         const playerBarArtistEl = document.getElementById('player-bar-artist');
+        const playerBarImageEl = document.getElementById('player-bar-image');
         const playerBarPlayPauseBtn = document.getElementById('player-bar-play-pause-btn');
-        const playerBarPrevBtn = document.getElementById('player-bar-prev-btn');
-        const playerBarNextBtn = document.getElementById('player-bar-next-btn');
-        const playerBarProgressBar = document.getElementById('player-bar-progress');
-        const playerBarProgressBarContainer = document.querySelector('#player-bar .progress-bar-container');
+        const nowPlayingPage = document.getElementById('now-playing-page');
+        const backFromNowPlayingBtn = document.getElementById('back-from-now-playing-btn');
+        const nowPlayingTitleEl = document.getElementById('now-playing-title');
+        const nowPlayingArtistEl = document.getElementById('now-playing-artist');
+        const nowPlayingImageEl = document.getElementById('now-playing-image');
+        const fullProgressBarContainer = document.getElementById('full-progress-bar-container');
+        const fullProgressBar = document.getElementById('full-progress-bar');
+        const currentTimeEl = document.getElementById('current-time');
+        const totalTimeEl = document.getElementById('total-time');
+        const fullPlayerPlayPauseBtn = document.getElementById('full-player-play-pause-btn');
+        const fullPlayerPrevBtn = document.getElementById('full-player-prev-btn');
+        const fullPlayerNextBtn = document.getElementById('full-player-next-btn');
+        const repeatBtn = document.getElementById('repeat-btn');
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        const sleepTimerSelect = document.getElementById('sleep-timer-select');
         let playlist = JSON.parse(localStorage.getItem('myPlaylist')) || [];
+        let playlists = JSON.parse(localStorage.getItem('myPlaylists')) || [];
         let currentSongIndex = localStorage.getItem('currentSongIndex') ? parseInt(localStorage.getItem('currentSongIndex')) : -1;
         let isPlaying = false;
         let originalPlaylist = [];
+        let shuffledPlaylist = [];
+        let isShuffling = false;
+        let repeatMode = 0; // 0: No repeat, 1: Repeat All, 2: Repeat One
+        let sleepTimerId = null;
         let draggedItem = null;
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
@@ -630,12 +817,21 @@
         function updateUI() {
             if (playlist.length === 0) {
                 playerBar.classList.remove('visible');
+                nowPlayingTitleEl.textContent = 'لا يوجد أغنية قيد التشغيل';
+                nowPlayingArtistEl.textContent = 'غير معروف';
+                nowPlayingImageEl.src = 'https://i.imgur.com/u7q6K6e.png';
                 return;
             }
             const currentSong = playlist[currentSongIndex];
+            const songImageSrc = currentSong.image || 'https://i.imgur.com/u7q6K6e.png';
             playerBarTitleEl.textContent = currentSong.title || currentSong.name;
             playerBarArtistEl.textContent = currentSong.artist || 'غير معروف';
+            playerBarImageEl.src = songImageSrc;
+            nowPlayingTitleEl.textContent = currentSong.title || currentSong.name;
+            nowPlayingArtistEl.textContent = currentSong.artist || 'غير معروف';
+            nowPlayingImageEl.src = songImageSrc;
             playerBarPlayPauseBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+            fullPlayerPlayPauseBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
             playerBar.classList.add('visible');
             const playlistItems = document.querySelectorAll('#playlist li');
             playlistItems.forEach((item, index) => {
@@ -652,8 +848,10 @@
                 name: song.name,
                 title: song.title,
                 artist: song.artist,
-                album: song.album || ''
+                album: song.album || '',
+                image: song.image || ''
             }))));
+            localStorage.setItem('myPlaylists', JSON.stringify(playlists));
             localStorage.setItem('currentSongIndex', currentSongIndex);
         }
         function getFileMetadata(file) {
@@ -666,7 +864,7 @@
                         let image = null;
                         if (tag.tags.picture) {
                             const picture = tag.tags.picture;
-                            const url = URL.createObjectURL(new Blob([picture.data], { type: picture.format }));
+                            const url = `data:${picture.format};base64,${btoa(String.fromCharCode.apply(null, picture.data))}`;
                             image = url;
                         }
                         resolve({ name: file.name, file: file, title: title, artist: artist, album: album, image: image });
@@ -714,23 +912,77 @@
         }
         function nextSong() {
             if (playlist.length === 0) return;
-            currentSongIndex++;
-            if (currentSongIndex >= playlist.length) {
-                currentSongIndex = 0;
+            let nextIndex = 0;
+            if (isShuffling) {
+                const currentShuffledIndex = shuffledPlaylist.findIndex(s => s.name === playlist[currentSongIndex].name);
+                let newIndex = currentShuffledIndex + 1;
+                if (newIndex >= shuffledPlaylist.length) {
+                    newIndex = 0;
+                }
+                const nextSongName = shuffledPlaylist[newIndex].name;
+                nextIndex = playlist.findIndex(s => s.name === nextSongName);
+            } else {
+                nextIndex = currentSongIndex + 1;
+                if (nextIndex >= playlist.length) {
+                    nextIndex = 0;
+                }
             }
-            loadSong(currentSongIndex);
+            loadSong(nextIndex);
         }
         function prevSong() {
             if (playlist.length === 0) return;
-            currentSongIndex--;
-            if (currentSongIndex < 0) {
-                currentSongIndex = playlist.length - 1;
+            let prevIndex = 0;
+            if (isShuffling) {
+                const currentShuffledIndex = shuffledPlaylist.findIndex(s => s.name === playlist[currentSongIndex].name);
+                let newIndex = currentShuffledIndex - 1;
+                if (newIndex < 0) {
+                    newIndex = shuffledPlaylist.length - 1;
+                }
+                const prevSongName = shuffledPlaylist[newIndex].name;
+                prevIndex = playlist.findIndex(s => s.name === prevSongName);
+            } else {
+                prevIndex = currentSongIndex - 1;
+                if (prevIndex < 0) {
+                    prevIndex = playlist.length - 1;
+                }
             }
-            loadSong(currentSongIndex);
+            loadSong(prevIndex);
+        }
+        function toggleRepeat() {
+            repeatMode = (repeatMode + 1) % 3;
+            repeatBtn.classList.remove('active');
+            repeatBtn.innerHTML = '<i class="fas fa-redo"></i>';
+            if (repeatMode === 1) {
+                repeatBtn.classList.add('active');
+            } else if (repeatMode === 2) {
+                repeatBtn.classList.add('active');
+                repeatBtn.innerHTML = '<i class="fas fa-redo-alt"></i>';
+            }
+        }
+        function toggleShuffle() {
+            isShuffling = !isShuffling;
+            if (isShuffling) {
+                shuffledPlaylist = [...playlist].sort(() => Math.random() - 0.5);
+                shuffleBtn.classList.add('active');
+            } else {
+                shuffleBtn.classList.remove('active');
+            }
+        }
+        function setSleepTimer(minutes) {
+            clearTimeout(sleepTimerId);
+            if (minutes > 0) {
+                const milliseconds = minutes * 60 * 1000;
+                sleepTimerId = setTimeout(() => {
+                    pauseSong();
+                    alert('تم إيقاف الموسيقى تلقائيًا');
+                    sleepTimerSelect.value = 0;
+                }, milliseconds);
+                alert(`تم ضبط مؤقت الإيقاف على ${minutes} دقيقة.`);
+            }
         }
         function renderPlaylist(filteredList = playlist) {
             playlistEl.innerHTML = '';
-            filteredList.forEach((song, index) => {
+            filteredList.forEach((song) => {
                 const li = document.createElement('li');
                 li.className = 'song-card';
                 const imageSrc = song.image ? song.image : 'https://i.imgur.com/u7q6K6e.png';
@@ -740,24 +992,84 @@
                         <h4>${song.title}</h4>
                         <p>${song.artist}</p>
                     </div>
-                    <button class="remove-btn" title="حذف الأغنية"><i class="fas fa-trash-can"></i></button>
+                    <div class="action-buttons">
+                        <button class="add-btn" title="إضافة إلى قائمة تشغيل"><i class="fas fa-plus-square"></i></button>
+                        <button class="remove-btn" title="حذف الأغنية"><i class="fas fa-trash-can"></i></button>
+                    </div>
                 `;
                 li.setAttribute('draggable', 'true');
-                li.dataset.originalIndex = index;
+                li.dataset.songName = song.name;
                 li.addEventListener('click', (e) => {
-                    if (e.target.closest('.remove-btn')) return;
+                    if (e.target.closest('.remove-btn') || e.target.closest('.add-btn')) return;
                     const originalIndex = playlist.findIndex(s => s.name === song.name);
                     loadSong(originalIndex);
                 });
                 li.querySelector('.remove-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const itemToRemove = e.target.closest('li');
-                    const indexToRemove = Array.from(playlistEl.children).indexOf(itemToRemove);
+                    const indexToRemove = playlist.findIndex(s => s.name === song.name);
                     removeSong(indexToRemove);
+                });
+                li.querySelector('.add-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showAddToListDialog(song);
                 });
                 playlistEl.appendChild(li);
             });
             updateUI();
+        }
+        function renderPlaylists() {
+            playlistsListEl.innerHTML = '';
+            playlists.forEach((pl, index) => {
+                const li = document.createElement('li');
+                li.className = 'song-card';
+                li.innerHTML = `
+                    <div class="song-info">
+                        <h4>${pl.name}</h4>
+                        <p>${pl.songs.length} أغنية</p>
+                    </div>
+                    <button class="remove-btn" title="حذف القائمة"><i class="fas fa-trash-can"></i></button>
+                `;
+                li.addEventListener('click', (e) => {
+                    if (e.target.closest('.remove-btn')) return;
+                    alert(`عرض أغاني قائمة التشغيل: ${pl.name}`);
+                });
+                li.querySelector('.remove-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm(`هل أنت متأكد من حذف قائمة التشغيل "${pl.name}"؟`)) {
+                        playlists.splice(index, 1);
+                        saveState();
+                        renderPlaylists();
+                    }
+                });
+                playlistsListEl.appendChild(li);
+            });
+        }
+        function showAddToListDialog(song) {
+            const listNames = playlists.map(pl => pl.name);
+            if (listNames.length === 0) {
+                alert('لا توجد قوائم تشغيل متاحة. قم بإنشاء قائمة تشغيل أولاً.');
+                return;
+            }
+            const selectedList = prompt(`اختر قائمة لإضافة "${song.title}" إليها:\n${listNames.map((name, i) => `${i + 1}. ${name}`).join('\n')}`);
+            if (selectedList) {
+                const index = parseInt(selectedList) - 1;
+                if (index >= 0 && index < playlists.length) {
+                    playlists[index].songs.push(song);
+                    saveState();
+                    alert('تم الإضافة بنجاح!');
+                    renderPlaylists();
+                } else {
+                    alert('اختيار غير صالح.');
+                }
+            }
+        }
+        function createNewPlaylist() {
+            const name = prompt('أدخل اسم قائمة التشغيل الجديدة:');
+            if (name && name.trim() !== '') {
+                playlists.push({ name: name, songs: [] });
+                saveState();
+                renderPlaylists();
+            }
         }
         function removeSong(index) {
             if (index < 0 || index >= playlist.length) return;
@@ -765,6 +1077,7 @@
                 pauseSong();
                 audioPlayer.src = '';
             }
+            const songName = playlist[index].name;
             playlist.splice(index, 1);
             originalPlaylist = [...playlist];
             if (currentSongIndex > index) {
@@ -772,8 +1085,12 @@
             } else if (currentSongIndex === index) {
                 currentSongIndex = -1;
             }
+            playlists.forEach(pl => {
+                pl.songs = pl.songs.filter(s => s.name !== songName);
+            });
             renderPlaylist();
             renderArtistsAndAlbums();
+            renderPlaylists();
             updateUI();
             saveState();
         }
@@ -866,20 +1183,36 @@
         audioPlayer.addEventListener('timeupdate', () => {
             const { currentTime, duration } = audioPlayer;
             const progressPercent = (currentTime / duration) * 100;
-            playerBarProgressBar.style.width = `${progressPercent}%`;
+            fullProgressBar.style.width = `${progressPercent}%`;
+            currentTimeEl.textContent = formatTime(currentTime);
+            totalTimeEl.textContent = formatTime(duration);
         });
         audioPlayer.addEventListener('ended', () => {
-            nextSong();
+            if (repeatMode === 2) {
+                audioPlayer.currentTime = 0;
+                audioPlayer.play();
+            } else {
+                nextSong();
+            }
         });
-        playerBarProgressBarContainer.addEventListener('click', (e) => {
-            const width = playerBarProgressBarContainer.clientWidth;
+        fullProgressBarContainer.addEventListener('click', (e) => {
+            const width = fullProgressBarContainer.clientWidth;
             const clickX = e.offsetX;
             const duration = audioPlayer.duration;
             audioPlayer.currentTime = (clickX / width) * duration;
         });
-        playerBarPlayPauseBtn.addEventListener('click', togglePlayPause);
-        playerBarNextBtn.addEventListener('click', nextSong);
-        playerBarPrevBtn.addEventListener('click', prevSong);
+        playerBar.addEventListener('click', (e) => {
+            if (e.target.closest('#player-bar-play-pause-btn')) {
+                togglePlayPause();
+            } else {
+                showPage('now-playing-page');
+            }
+        });
+        fullPlayerPlayPauseBtn.addEventListener('click', togglePlayPause);
+        fullPlayerNextBtn.addEventListener('click', nextSong);
+        fullPlayerPrevBtn.addEventListener('click', prevSong);
+        repeatBtn.addEventListener('click', toggleRepeat);
+        shuffleBtn.addEventListener('click', toggleShuffle);
         searchBox.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             const filteredPlaylist = originalPlaylist.filter(song =>
@@ -888,6 +1221,10 @@
                 (song.name && song.name.toLowerCase().includes(searchTerm))
             );
             renderPlaylist(filteredPlaylist);
+        });
+        sleepTimerSelect.addEventListener('change', (e) => {
+            const minutes = parseInt(e.target.value);
+            setSleepTimer(minutes);
         });
         function showPage(pageId) {
             pages.forEach(page => {
@@ -911,16 +1248,25 @@
             item.addEventListener('click', () => {
                 const pageId = item.dataset.page;
                 showPage(pageId);
+                if (pageId === 'playlists-page') {
+                    renderPlaylists();
+                }
             });
         });
         sectionBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const pageId = btn.dataset.page;
                 showPage(pageId);
+                if (pageId === 'playlists-page') {
+                    renderPlaylists();
+                }
             });
         });
         openSettingsBtn.addEventListener('click', () => showPage('settings-page'));
         backFromSettingsBtn.addEventListener('click', () => showPage('home-page'));
+        backFromPlaylistsBtn.addEventListener('click', () => showPage('home-page'));
+        backFromNowPlayingBtn.addEventListener('click', () => showPage('home-page'));
+        createPlaylistBtn.addEventListener('click', createNewPlaylist);
         darkModeToggle.addEventListener('change', () => {
             if (darkModeToggle.checked) {
                 document.body.classList.add('dark-mode');
@@ -949,6 +1295,7 @@
         originalPlaylist = [...playlist];
         renderPlaylist();
         renderArtistsAndAlbums();
+        renderPlaylists();
         updateUI();
     </script>
 </body>
