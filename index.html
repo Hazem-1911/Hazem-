@@ -1,432 +1,1629 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سلة طازة - منتجات طازجة لمنزلك</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>Kora App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;charset=utf-8,%7B%0A%20%20%22name%22%3A%20%22Kora%20App%22%2C%0A%20%20%22short_name%22%3A%22Kora%22%2C%0A%20%20%22description%22%3A%20%22A%20progressive%20web%20app%20for%20football%20news%20and%20matches.%22%2C%0A%20%20%22start_url%22%3A%20%22.%2F%22%2C%0A%20%20%22display%22%3A%20%22standalone%22%2C%0A%20%20%22background_color%22%3A%20%22%23f4f7f6%22%2C%0A%20%20%22theme_color%22%3A%20%22%234a90e2%22%2C%0A%20%20%20%20%22icons%22%3A%20%5B%0A%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%22src%22%3A%20%22https%3A%2F%2Fplacehold.co%2F192x192%2F4a90e2%2Fffffff%3Ftext%3DKora%22%2C%0A%20%20%20%20%20%20%20%20%22sizes%22%3A%20%22192x192%22%2C%0A%20%20%20%20%20%20%20%20%22type%22%3A%20%22image%2Fpng%22%0A%20%20%20%20%20%20%7D%2C%0A%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%22src%22%3A%20%22https%3A%2F%2Fplacehold.co%2F512x512%2F4a90e2%2Fffffff%3Ftext%3DKora%22%2C%0A%20%20%20%20%20%20%20%20%22sizes%22%3A%20%22512x512%22%2C%0A%20%20%20%20%20%20%20%20%22type%22%3A%20%22image%2Fpng%22%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%5D%0A%7D">
     
     <style>
-        body {
-            font-family: 'Cairo', sans-serif; /* استخدام خط أفضل */
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
-            direction: rtl;
+        :root {
+            --bg-color-light: #f4f7f6;
+            --text-color-light: #1a202c;
+            --card-bg-light: #ffffff;
+            --card-border-light: #e2e8f0;
+            --primary-color: #4a90e2;
+            --secondary-color: #55a8f2;
+            --toast-bg-success: #48bb78;
+            --toast-bg-error: #f56565;
+            --input-border-light: #cbd5e0;
+            --nav-bg-light: #ffffff;
+            --nav-shadow-light: rgba(0, 0, 0, 0.1);
+            --gradient-1: #4a90e2;
+            --gradient-2: #55a8f2;
+            --gradient-bg-light: linear-gradient(135deg, #f4f7f6 0%, #e8eaf6 100%);
+            --box-shadow-1: 0 4px 14px rgba(0, 0, 0, 0.1);
+            --box-shadow-2: 0 6px 12px rgba(0, 0, 0, 0.1);
+            --modal-bg-light: #ffffff;
         }
 
-        .container {
-            width: 90%;
-            max-width: 1100px;
-            margin: 0 auto;
+        .dark-mode {
+            --bg-color-light: #1a202c;
+            --text-color-light: #f4f7f6;
+            --card-bg-light: #2d3748;
+            --card-border-light: #4a5568;
+            --primary-color: #63b3ed;
+            --secondary-color: #76a9f0;
+            --toast-bg-success: #68d391;
+            --toast-bg-error: #fc8181;
+            --input-border-light: #4a5568;
+            --nav-bg-light: #2d3748;
+            --nav-shadow-light: rgba(255, 255, 255, 0.1);
+            --gradient-1: #63b3ed;
+            --gradient-2: #76a9f0;
+            --gradient-bg-light: linear-gradient(135deg, #1a202c 0%, #2a3140 100%);
+            --box-shadow-1: 0 4px 14px rgba(255, 255, 255, 0.05);
+            --box-shadow-2: 0 6px 12px rgba(255, 255, 255, 0.1);
+            --modal-bg-light: #2d3748;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color-light);
+            color: var(--text-color-light);
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+            direction: rtl; /* Default direction */
+            background-image: var(--gradient-bg-light);
+            background-attachment: fixed;
+        }
+
+        .app-container {
+            max-width: 600px;
+            margin: auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
         }
 
         header {
-            background-color: #fff;
-            padding: 1rem 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: var(--nav-bg-light);
+            box-shadow: 0 4px 6px -1px var(--nav-shadow-light);
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
         }
 
-        header .container {
+        .main-content {
+            flex: 1;
+            padding: 1rem;
+        }
+
+        .page {
+            display: none;
+            animation: slideInFromRight 0.5s ease-in-out forwards;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Auth page styles */
+        .auth-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .auth-form {
+            background-color: var(--card-bg-light);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--box-shadow-1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-form h2 {
+            margin-top: 0;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--input-border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .auth-form input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .auth-form button {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .auth-form button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .auth-form p {
+            margin-top: 1rem;
+            cursor: pointer;
+            color: var(--primary-color);
+            transition: color 0.3s;
+        }
+
+        .auth-form p:hover {
+            text-decoration: underline;
+        }
+
+        /* Nav Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--nav-bg-light);
+            border-top: 1px solid var(--card-border-light);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 0.5rem 0;
+            z-index: 1000;
+            box-shadow: 0 -4px 6px -1px var(--nav-shadow-light);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-color-light);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.3s;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .nav-item i {
+            font-size: 1.5rem;
+            margin-bottom: 0.2rem;
+        }
+
+        /* News Cards & Matches */
+        .news-container, .matches-container, .favorites-container, .stats-container, .teams-container, .leagues-container {
+            padding-bottom: 60px; /* To prevent content from being hidden by navbar */
+        }
+        
+        .search-container {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 0.75rem 2.5rem 0.75rem 1rem;
+            border: 1px solid var(--input-border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .search-container input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            outline: none;
+        }
+        
+        .search-container i {
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .card {
+            background-color: var(--card-bg-light);
+            border: 1px solid var(--card-border-light);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-2);
+        }
+        
+        .card .favorite-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+            z-index: 2;
+        }
+        
+        .card .favorite-btn.active {
+            color: gold;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            padding-right: 2rem;
+        }
+
+        .card p {
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--text-color-light);
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            object-fit: cover;
+        }
+
+        .match-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .live-card {
+            background-image: linear-gradient(to right, var(--gradient-1), var(--gradient-2));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            text-align: center;
+            box-shadow: var(--box-shadow-1);
+        }
+        
+        .live-card .teams-names {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .live-card .live-time {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .match-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .logo {
-            color: #27ae60;
-            font-size: 2rem;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            align-items: center;
-        }
-
-        nav ul li {
-            margin-right: 25px;
-        }
-
-        nav ul li a {
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-            transition: color 0.3s;
-            cursor: pointer;
-            padding-bottom: 5px;
-        }
-
-        nav ul li a:hover {
-            color: #27ae60;
-        }
-        
-        nav ul li a.active-link {
-            color: #27ae60;
-            border-bottom: 2px solid #27ae60;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            background-color: #27ae60;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-        }
-        
-        .btn:hover {
-            background-color: #2ecc71;
-        }
-
-        .btn-primary {
-            background-color: #e67e22;
-        }
-        .btn-primary:hover {
-            background-color: #f39c12;
-        }
-
-        .page { display: none; }
-        .page.active { display: block; }
-
-        .hero {
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80') no-repeat center center/cover;
-            color: #fff;
-            text-align: center;
-            padding: 100px 0;
-        }
-
-        .hero h2 { font-size: 3rem; margin-bottom: 10px; }
-
-        .products, .about {
-            padding: 50px 0;
-            text-align: center;
-        }
-
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .product-card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            text-align: center;
-            padding: 20px;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.12);
-        }
-
-        .product-card img {
-            max-width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-
-        .product-card h4 {
-            margin: 15px 0 10px;
-            font-size: 1.2rem;
-        }
-
-        .product-card .price {
-            color: #27ae60;
+        .team-name {
             font-weight: bold;
             font-size: 1.1rem;
-            margin-bottom: 15px;
         }
 
-        .auth-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 50px 0;
+        .score {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--secondary-color);
         }
-
-        .auth-form {
-            background: #fff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .auth-form h2 { margin-bottom: 20px; color: #333; }
-        .form-group { margin-bottom: 15px; text-align: right; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .auth-form p { margin-top: 20px; }
-        .auth-form p a { color: #27ae60; font-weight: bold; cursor: pointer; }
         
-        footer {
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            padding: 20px 0;
-            margin-top: 40px;
+        .dark-mode .score {
+            color: var(--text-color-light);
+        }
+        
+        /* Teams Page Styles */
+        .league-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--card-border-light);
+            padding-bottom: 0.5rem;
         }
 
-        /* Responsive Design */
-        .menu-icon {
-            display: none;
-            font-size: 2rem;
+        .team-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--card-bg-light);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
             cursor: pointer;
         }
         
-        #cart-link a {
-            font-size: 1.5rem;
-            position: relative;
+        .team-item:hover {
+            transform: translateY(-3px);
         }
-        #cart-count {
-            position: absolute;
-            top: -5px;
-            right: -10px;
-            background-color: #e74c3c;
-            color: white;
+        
+        .team-details {
+            display: flex;
+            align-items: center;
+        }
+        
+        .team-item img {
+            width: 50px;
+            height: 50px;
+            margin-left: 1rem;
             border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.8rem;
+            border: 2px solid var(--primary-color);
+        }
+        
+        .team-item .team-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .team-item button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        
+        .team-item button:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.05);
         }
 
-        @media (max-width: 768px) {
-            header .container { position: relative; }
-            .menu-icon { display: block; }
+        .team-item button.remove {
+            background-color: #f56565;
+        }
+        
+        .team-item button.remove:hover {
+            background-color: #e53e3e;
+        }
 
-            nav ul {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 60px;
-                left: 0;
-                background-color: #fff;
-                width: 100%;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-                border-top: 1px solid #eee;
-            }
+        /* Leagues Page Styles */
+        .leagues-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            padding-bottom: 60px;
+        }
 
-            nav ul.active { display: flex; }
+        .league-card {
+            background-color: var(--card-bg-light);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .league-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-2);
+        }
+        
+        .league-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+        
+        .league-card h3 {
+            margin: 0.5rem 0 0;
+            font-size: 1.1rem;
+            color: var(--text-color-light);
+        }
 
-            nav ul li {
-                margin: 15px 0;
-                text-align: center;
-                width: 100%;
-            }
+        /* Stats Page Styles */
+        .stat-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: var(--card-bg-light);
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-item .rank {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .stat-item .player-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 1rem;
+            border: 2px solid var(--primary-color);
+        }
+        
+        .stat-item .player-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-item .player-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .stat-item .stat-value {
+            font-size: 1rem;
+            color: #999;
+        }
+
+        /* Settings Page */
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--card-border-light);
+            cursor: pointer;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--input-border-light);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Toast Messages */
+        #toast-container {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+        }
+
+        .toast {
+            background-color: var(--toast-bg-success);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .toast.error {
+            background-color: var(--toast-bg-error);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--modal-bg-light);
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: var(--box-shadow-2);
+            animation: slideUp 0.3s forwards;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: var(--text-color-light);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .team-modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .team-modal-header img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-left: 1rem;
+        }
+        
+        .team-modal-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .tab-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--card-border-light);
+        }
+        
+        .tab-item {
+            padding: 0.75rem;
+            cursor: pointer;
+            font-weight: bold;
+            color: #999;
+            transition: color 0.3s, border-bottom 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab-item.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+        
+        .player-item, .stat-row {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--card-border-light);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .player-item:last-child, .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .player-item .player-name {
+            font-weight: bold;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideInFromRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .page.active {
+            animation: slideInFromRight 0.5s ease-in-out forwards;
+        }
+
+        .go-back {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        
+        .go-back i {
+            margin-right: 0.5rem;
+        }
+        
+        /* Fix for RTL */
+        html[dir="rtl"] .go-back i {
+            margin-right: 0;
+            margin-left: 0.5rem;
+        }
+        html[dir="rtl"] .search-container i {
+            right: 1rem;
+            left: auto;
+        }
+        html[dir="rtl"] .card .favorite-btn {
+            right: 1rem;
+            left: auto;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="container">
-            <a href="#" class="logo" onclick="showPage('home')">سلة طازة</a>
-            <nav id="main-nav">
-                <ul id="nav-links">
-                    <li><a onclick="showPage('home')">الرئيسية</a></li>
-                    <li><a onclick="showPage('products')">المنتجات</a></li>
-                    <li><a onclick="showPage('about')">عنا</a></li>
-                    <li id="cart-link"><a onclick="showPage('cart')">🛒<span id="cart-count">0</span></a></li>
-                    <li id="login-link"><a onclick="showPage('login')" class="btn">تسجيل الدخول</a></li>
-                    <li id="logout-link" style="display:none;"><a onclick="logout()" class="btn">تسجيل الخروج</a></li>
-                </ul>
-            </nav>
-            <div class="menu-icon" onclick="toggleMenu()">☰</div>
+<div class="app-container">
+    <div id="auth-page" class="auth-container page active">
+        <div class="auth-form">
+            <h2 id="auth-title">تسجيل الدخول</h2>
+            <form id="auth-form-el">
+                <input type="email" id="email" placeholder="البريد الإلكتروني" required>
+                <input type="password" id="password" placeholder="كلمة المرور" required>
+                <button type="submit" id="auth-btn">تسجيل الدخول</button>
+            </form>
+            <p id="toggle-auth">ليس لديك حساب؟ إنشاء حساب</p>
         </div>
-    </header>
+    </div>
 
-    <main>
-        <!-- Home Page -->
-        <section id="home-page" class="page">
-            <div class="hero">
-                <div class="container">
-                    <h2>أفضل المنتجات الطازجة تصلك حتى باب بيتك</h2>
-                    <p>خضروات، فواكه، والمزيد... اطلب الآن!</p>
-                    <a onclick="showPage('products')" class="btn btn-primary">تصفح المنتجات</a>
+    <div id="main-app" style="display: none;">
+        <header>
+            <span id="header-title"></span>
+        </header>
+
+        <div class="main-content">
+            <div id="leagues-page" class="page active">
+                <h2>الدوريات</h2>
+                <div class="leagues-grid" id="leagues-grid">
+                    <!-- Leagues will be loaded dynamically here -->
                 </div>
             </div>
-        </section>
-
-        <!-- Products Page -->
-        <section id="products-page" class="page">
-            <div class="products container">
-                <h3>منتجاتنا الطازجة</h3>
-                <div id="product-list" class="product-grid">
-                    <!-- Products will be rendered here by JavaScript -->
+            
+            <div id="teams-by-league-page" class="page">
+                <div class="go-back" onclick="goToLeaguesPage()">
+                    <i class="fas fa-arrow-right"></i>
+                    <span id="go-back-text">العودة للدوريات</span>
+                </div>
+                <h2 id="league-teams-title"></h2>
+                <div class="teams-container" id="teams-by-league-container">
+                    <!-- Teams will be dynamically loaded here -->
                 </div>
             </div>
-        </section>
+
+            <div id="news-page" class="page">
+                <div class="search-container">
+                    <input type="text" id="news-search" placeholder="ابحث عن الأخبار...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="news-container">
+                    <!-- News will be dynamically loaded here -->
+                </div>
+            </div>
+
+            <div id="matches-page" class="page">
+                <div class="live-matches">
+                    <h2>المباريات المباشرة</h2>
+                    <div id="live-matches-container">
+                        <!-- Live matches will be dynamically loaded here -->
+                    </div>
+                </div>
+                <div class="upcoming-matches">
+                    <h2>المباريات القادمة والمنتهية</h2>
+                    <div id="upcoming-matches-container">
+                        <!-- Upcoming and finished matches will be dynamically loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="teams-page" class="page">
+                <h2>جميع الفرق</h2>
+                <div class="teams-container">
+                    <!-- Teams will be dynamically loaded here -->
+                </div>
+            </div>
+
+            <div id="favorites-page" class="page">
+                <div id="favorites-container">
+                    <h2>المفضلة</h2>
+                    <p id="no-favorites-msg" style="text-align: center; color: #999;">لا توجد عناصر في المفضلة.</p>
+                </div>
+            </div>
+
+            <div id="settings-page" class="page">
+                <div class="settings-container">
+                    <div class="settings-item">
+                        <span><i class="fas fa-moon"></i> الوضع الداكن</span>
+                        <label class="switch">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <span><i class="fas fa-language"></i> اللغة</span>
+                        <select id="language-select" style="background: none; border: none; font-size: 1rem; color: var(--text-color-light);">
+                            <option value="ar">العربية</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <div class="settings-item" id="request-notifications">
+                        <span><i class="fas fa-bell"></i> تفعيل الإشعارات</span>
+                    </div>
+                    <div class="settings-item" id="share-app">
+                        <span><i class="fas fa-share-alt"></i> مشاركة التطبيق</span>
+                    </div>
+                    <div class="settings-item" id="about-app">
+                        <span><i class="fas fa-info-circle"></i> عن التطبيق</span>
+                    </div>
+                    <div class="settings-item" id="logout">
+                        <span><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navbar">
+            <a href="#" class="nav-item active" data-page="leagues-page"><i class="fas fa-shield-alt"></i> <span>الدوريات</span></a>
+            <a href="#" class="nav-item" data-page="news-page"><i class="fas fa-newspaper"></i> <span>الأخبار</span></a>
+            <a href="#" class="nav-item" data-page="matches-page"><i class="fas fa-futbol"></i> <span>المباريات</span></a>
+            <a href="#" class="nav-item" data-page="favorites-page"><i class="fas fa-star"></i> <span>المفضلة</span></a>
+            <a href="#" class="nav-item" data-page="settings-page"><i class="fas fa-cog"></i> <span>الإعدادات</span></a>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<!-- Team Details Modal -->
+<div id="team-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <div id="team-modal-content">
+            <!-- Content will be injected here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // In-memory data for news, matches, teams, and stats
+    const newsData = [
+        {"id": 1, "title": {"ar": "ريال مدريد يتربع على عرش الدوري بعد فوز مثير", "en": "Real Madrid tops the league after thrilling victory"}, "summary": {"ar": "حقق ريال مدريد فوزاً صعباً على منافسه ليحافظ على صدارة الدوري الإسباني بفارق كبير من النقاط.", "en": "Real Madrid secured a difficult victory over their rival to maintain a significant points lead in the Spanish League."}, "date": "2024-05-15", "image": "https://placehold.co/400x200/4a90e2/ffffff?text=Real+Madrid+Win"},
+        {"id": 2, "title": {"ar": "ليفربول يعلن عن تعاقده مع نجم جديد", "en": "Liverpool announces a new signing"}, "summary": {"ar": "أعلن نادي ليفربول رسمياً عن إتمام صفقة التعاقد مع المهاجم الشاب في صفقة قياسية.", "en": "Liverpool FC officially announced the completion of a record-breaking deal for the young striker."}, "date": "2024-05-14", "image": "https://placehold.co/400x200/dc2626/ffffff?text=New+Signing"},
+        {"id": 3, "title": {"ar": "نيمار يعود للتدريبات بعد تعافيه من الإصابة", "en": "Neymar returns to training after recovering from injury"}, "summary": {"ar": "شارك اللاعب البرازيلي نيمار في تدريبات فريقه لأول مرة بعد غياب طويل بسبب الإصابة.", "en": "Brazilian player Neymar participated in his team's training for the first time after a long absence due to injury."}, "date": "2024-05-13", "image": "https://placehold.co/400x200/4a5568/ffffff?text=Neymar+Returns"},
+        {"id": 4, "title": {"ar": "مانشستر سيتي يتوج بطلاً لدوري الأبطال", "en": "Manchester City crowned Champions League winner"}, "summary": {"ar": "بعد مباراة حافلة بالإثارة، تمكن مانشستر سيتي من الفوز باللقب الأوروبي الأغلى للمرة الأولى في تاريخه.", "en": "After an exciting match, Manchester City managed to win the most prestigious European title for the first time in their history."}, "date": "2024-05-12", "image": "https://placehold.co/400x200/3182ce/ffffff?text=Champions+Win"},
+        {"id": 5, "title": {"ar": "محمد صلاح يفوز بجائزة أفضل لاعب في الموسم", "en": "Mohamed Salah wins Player of the Season award"}, "summary": {"ar": "واصل النجم المصري تألقه وفاز بجائزة أفضل لاعب في الدوري الإنجليزي للموسم الحالي، في إنجاز جديد يضاف لسجله.", "en": "The Egyptian star continued to shine and won the Player of the Season award in the Premier League, adding another achievement to his record."}, "date": "2024-05-11", "image": "https://placehold.co/400x200/f6ad55/ffffff?text=Salah+Wins"}
+    ];
+
+    const matchesData = [
+        {"id": 1, "teams": [{"ar": "الأهلي", "en": "Al Ahly"}, {"ar": "الزمالك", "en": "Zamalek"}], "status": "upcoming", "time": {"ar": "اليوم 8:00 مساءً", "en": "Today 8:00 PM"}},
+        {"id": 2, "teams": [{"ar": "برشلونة", "en": "Barcelona"}, {"ar": "ريال مدريد", "en": "Real Madrid"}], "status": "finished", "score": [3, 2], "time": {"ar": "الأمس 10:00 مساءً", "en": "Yesterday 10:00 PM"}},
+        {"id": 3, "teams": [{"ar": "باريس سان جيرمان", "en": "PSG"}, {"ar": "بايرن ميونخ", "en": "Bayern Munich"}], "status": "upcoming", "time": {"ar": "الجمعة 9:45 مساءً", "en": "Friday 9:45 PM"}},
+        {"id": 4, "teams": [{"ar": "ليفربول", "en": "Liverpool"}, {"ar": "مانشستر يونايتد", "en": "Manchester United"}], "status": "finished", "score": [1, 1], "time": {"ar": "منذ يومين", "en": "Two days ago"}}
+    ];
+    
+    const liveMatchesData = [
+        {"id": 10, "teams": [{"ar": "الأهلي", "en": "Al Ahly"}, {"ar": "الزمالك", "en": "Zamalek"}], "time": {"ar": "مباشر", "en": "Live"}}
+    ];
+    
+    const allTeamsData = [
+        {"id": 1, "name": {"ar": "ريال مدريد", "en": "Real Madrid"}, "logo": "https://upload.wikimedia.org/wikipedia/en/5/58/Real_Madrid_CF_logo.svg", "league": "Spanish La Liga", "players": [{"name": {"ar": "فينيسيوس جونيور", "en": "Vinícius Júnior"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "جود بيلينجهام", "en": "Jude Bellingham"}, "pos": {"ar": "وسط", "en": "Midfielder"}}, {"name": {"ar": "توني كروس", "en": "Toni Kroos"}, "pos": {"ar": "وسط", "en": "Midfielder"}}], "stats": {"ar": {"matches": 38, "wins": 30, "draws": 6, "losses": 2, "points": 96, "goals": 87}, "en": {"matches": 38, "wins": 30, "draws": 6, "losses": 2, "points": 96, "goals": 87}}},
+        {"id": 2, "name": {"ar": "برشلونة", "en": "Barcelona"}, "logo": "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg", "league": "Spanish La Liga", "players": [{"name": {"ar": "روبرت ليفاندوفسكي", "en": "Robert Lewandowski"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "جافي", "en": "Gavi"}, "pos": {"ar": "وسط", "en": "Midfielder"}}, {"name": {"ar": "بيدري", "en": "Pedri"}, "pos": {"ar": "وسط", "en": "Midfielder"}}], "stats": {"ar": {"matches": 38, "wins": 26, "draws": 7, "losses": 5, "points": 85, "goals": 79}, "en": {"matches": 38, "wins": 26, "draws": 7, "losses": 5, "points": 85, "goals": 79}}},
+        {"id": 3, "name": {"ar": "ليفربول", "en": "Liverpool"}, "logo": "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg", "league": "Premier League", "players": [{"name": {"ar": "محمد صلاح", "en": "Mohamed Salah"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "فيرجيل فان دايك", "en": "Virgil van Dijk"}, "pos": {"ar": "مدافع", "en": "Defender"}}, {"name": {"ar": "داروين نونيز", "en": "Darwin Núñez"}, "pos": {"ar": "مهاجم", "en": "Forward"}}], "stats": {"ar": {"matches": 38, "wins": 24, "draws": 10, "losses": 4, "points": 82, "goals": 86}, "en": {"matches": 38, "wins": 24, "draws": 10, "losses": 4, "points": 82, "goals": 86}}},
+        {"id": 4, "name": {"ar": "مانشستر سيتي", "en": "Manchester City"}, "logo": "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg", "league": "Premier League", "players": [{"name": {"ar": "إيرلينج هالاند", "en": "Erling Haaland"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "كيفين دي بروين", "en": "Kevin De Bruyne"}, "pos": {"ar": "وسط", "en": "Midfielder"}}, {"name": {"ar": "فيل فودين", "en": "Phil Foden"}, "pos": {"ar": "مهاجم", "en": "Forward"}}], "stats": {"ar": {"matches": 38, "wins": 28, "draws": 7, "losses": 3, "points": 91, "goals": 96}, "en": {"matches": 38, "wins": 28, "draws": 7, "losses": 3, "points": 91, "goals": 96}}},
+        {"id": 5, "name": {"ar": "بايرن ميونخ", "en": "Bayern Munich"}, "logo": "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg", "league": "German Bundesliga", "players": [{"name": {"ar": "هاري كين", "en": "Harry Kane"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "توماس مولر", "en": "Thomas Müller"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "جوشوا كيميش", "en": "Joshua Kimmich"}, "pos": {"ar": "وسط", "en": "Midfielder"}}], "stats": {"ar": {"matches": 34, "wins": 23, "draws": 4, "losses": 7, "points": 73, "goals": 94}, "en": {"matches": 34, "wins": 23, "draws": 4, "losses": 7, "points": 73, "goals": 94}}},
+        {"id": 6, "name": {"ar": "تشيلسي", "en": "Chelsea"}, "logo": "https://upload.wikimedia.org/wikipedia/en/7/71/Chelsea_FC.svg", "league": "Premier League", "players": [{"name": {"ar": "كول بالمر", "en": "Cole Palmer"}, "pos": {"ar": "وسط", "en": "Midfielder"}}, {"name": {"ar": "رحيم سترلينج", "en": "Raheem Sterling"}, "pos": {"ar": "مهاجم", "en": "Forward"}}], "stats": {"ar": {"matches": 38, "wins": 18, "draws": 9, "losses": 11, "points": 63, "goals": 77}, "en": {"matches": 38, "wins": 18, "draws": 9, "losses": 11, "points": 63, "goals": 77}}},
+        {"id": 7, "name": {"ar": "أرسنال", "en": "Arsenal"}, "logo": "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg", "league": "Premier League", "players": [{"name": {"ar": "بوكايو ساكا", "en": "Bukayo Saka"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "مارتن أوديجارد", "en": "Martin Ødegaard"}, "pos": {"ar": "وسط", "en": "Midfielder"}}], "stats": {"ar": {"matches": 38, "wins": 28, "draws": 5, "losses": 5, "points": 89, "goals": 91}, "en": {"matches": 38, "wins": 28, "draws": 5, "losses": 5, "points": 89, "goals": 91}}},
+        {"id": 8, "name": {"ar": "مانشستر يونايتد", "en": "Manchester United"}, "logo": "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg", "league": "Premier League", "players": [{"name": {"ar": "برونو فيرنانديز", "en": "Bruno Fernandes"}, "pos": {"ar": "وسط", "en": "Midfielder"}}, {"name": {"ar": "ماركوس راشفورد", "en": "Marcus Rashford"}, "pos": {"ar": "مهاجم", "en": "Forward"}}], "stats": {"ar": {"matches": 38, "wins": 18, "draws": 6, "losses": 14, "points": 60, "goals": 57}, "en": {"matches": 38, "wins": 18, "draws": 6, "losses": 14, "points": 60, "goals": 57}}},
+        {"id": 9, "name": {"ar": "توتنهام هوتسبير", "en": "Tottenham Hotspur"}, "logo": "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg", "league": "Premier League", "players": [{"name": {"ar": "هيونج مين سون", "en": "Son Heung-min"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "جيمس ماديسون", "en": "James Maddison"}, "pos": {"ar": "وسط", "en": "Midfielder"}}], "stats": {"ar": {"matches": 38, "wins": 20, "draws": 6, "losses": 12, "points": 66, "goals": 74}, "en": {"matches": 38, "wins": 20, "draws": 6, "losses": 12, "points": 66, "goals": 74}}},
+        {"id": 10, "name": {"ar": "الأهلي", "en": "Al Ahly"}, "logo": "https://upload.wikimedia.org/wikipedia/ar/d/d4/Al-Ahly_SC_logo.svg", "league": "Egyptian Premier League", "players": [{"name": {"ar": "محمود كهربا", "en": "Mahmoud Kahraba"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "حسين الشحات", "en": "Hussein El Shahat"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "علي معلول", "en": "Ali Maâloul"}, "pos": {"ar": "مدافع", "en": "Defender"}}], "stats": {"ar": {"matches": 20, "wins": 15, "draws": 5, "losses": 0, "points": 50, "goals": 45}, "en": {"matches": 20, "wins": 15, "draws": 5, "losses": 0, "points": 50, "goals": 45}}},
+        {"id": 11, "name": {"ar": "الزمالك", "en": "Zamalek"}, "logo": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Zamalek_SC_logo.svg", "league": "Egyptian Premier League", "players": [{"name": {"ar": "أحمد سيد زيزو", "en": "Ahmed Sayed Zizo"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "يوسف أوباما", "en": "Youssef Obama"}, "pos": {"ar": "وسط", "en": "Midfielder"}}, {"name": {"ar": "مصطفى شلبي", "en": "Mostafa Shalaby"}, "pos": {"ar": "مهاجم", "en": "Forward"}}], "stats": {"ar": {"matches": 20, "wins": 13, "draws": 6, "losses": 1, "points": 45, "goals": 40}, "en": {"matches": 20, "wins": 13, "draws": 6, "losses": 1, "points": 45, "goals": 40}}},
+        {"id": 12, "name": {"ar": "بيراميدز", "en": "Pyramids FC"}, "logo": "https://upload.wikimedia.org/wikipedia/en/9/9c/Pyramids_FC_logo.svg", "league": "Egyptian Premier League", "players": [{"name": {"ar": "فخر الدين بن يوسف", "en": "Fakhreddine Ben Youssef"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "رمضان صبحي", "en": "Ramadan Sobhi"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "عبد الله السعيد", "en": "Abdallah El Said"}, "pos": {"ar": "وسط", "en": "Midfielder"}}], "stats": {"ar": {"matches": 20, "wins": 14, "draws": 4, "losses": 2, "points": 46, "goals": 42}, "en": {"matches": 20, "wins": 14, "draws": 4, "losses": 2, "points": 46, "goals": 42}}},
+        {"id": 13, "name": {"ar": "فيوتشر", "en": "Future FC"}, "logo": "https://upload.wikimedia.org/wikipedia/en/5/52/Future_FC_logo.svg", "league": "Egyptian Premier League", "players": [{"name": {"ar": "أحمد عاطف", "en": "Ahmed Atef"}, "pos": {"ar": "مهاجم", "en": "Forward"}}, {"name": {"ar": "محمد رضا بوبو", "en": "Mohamed Reda Bobo"}, "pos": {"ar": "وسط", "en": "Midfielder"}}], "stats": {"ar": {"matches": 20, "wins": 10, "draws": 8, "losses": 2, "points": 38, "goals": 30}, "en": {"matches": 20, "wins": 10, "draws": 8, "losses": 2, "points": 38, "goals": 30}}}
+    ];
+    
+    const leaguesData = [
+        {"id": "epl", "name": {"ar": "الدوري الإنجليزي", "en": "Premier League"}, "logo": "https://upload.wikimedia.org/wikipedia/en/f/f2/Premier_League_Logo.svg", "teams": allTeamsData.filter(t => t.league === "Premier League")},
+        {"id": "egyptian", "name": {"ar": "الدوري المصري", "en": "Egyptian Premier League"}, "logo": "https://upload.wikimedia.org/wikipedia/commons/0/07/Egyptian_Premier_League_logo.svg", "teams": allTeamsData.filter(t => t.league === "Egyptian Premier League")},
+        {"id": "la_liga", "name": {"ar": "الدوري الإسباني", "en": "Spanish La Liga"}, "logo": "https://upload.wikimedia.org/wikipedia/commons/4/43/LaLiga_logo.svg", "teams": allTeamsData.filter(t => t.league === "Spanish La Liga")}
+    ];
+
+    const translations = {
+        ar: {
+            appTitle: "تطبيق كورة",
+            loginTitle: "تسجيل الدخول",
+            registerTitle: "إنشاء حساب",
+            loginBtn: "تسجيل الدخول",
+            registerBtn: "إنشاء حساب",
+            toggleToRegister: "ليس لديك حساب؟ إنشاء حساب",
+            toggleToLogin: "لديك حساب؟ تسجيل الدخول",
+            leagues: "الدوريات",
+            news: "الأخبار",
+            matches: "المباريات",
+            teams: "الفرق",
+            favorites: "المفضلة",
+            settings: "الإعدادات",
+            leaguesPageTitle: "الدوريات",
+            teamsPageTitle: "جميع الفرق",
+            newsPageTitle: "آخر الأخبار",
+            matchesPageTitle: "المباريات",
+            favoritesPageTitle: "المفضلة",
+            settingsPageTitle: "الإعدادات",
+            aboutAppTitle: "عن التطبيق",
+            aboutAppMessage: "تطبيق كورة هو تطبيق ويب تجريبي لعرض أخبار ومباريات كرة القدم.",
+            shareSuccess: "تم نسخ رابط التطبيق بنجاح!",
+            loginSuccess: "تم تسجيل الدخول بنجاح!",
+            registerSuccess: "تم إنشاء الحساب بنجاح!",
+            logoutSuccess: "تم تسجيل الخروج بنجاح!",
+            emailRequired: "البريد الإلكتروني مطلوب.",
+            passwordRequired: "كلمة المرور مطلوبة.",
+            invalidCredentials: "البريد أو كلمة المرور غير صحيحة.",
+            userExists: "الحساب موجود بالفعل. يرجى تسجيل الدخول.",
+            noData: "لا توجد بيانات متاحة حاليًا.",
+            upcomingMatch: "مباراة قادمة",
+            finishedMatch: "مباراة منتهية",
+            liveMatches: "مباريات مباشرة",
+            upcomingFinishedMatches: "المباريات القادمة والمنتهية",
+            noFavorites: "لا توجد عناصر في المفضلة.",
+            newsAdded: "تمت إضافة الخبر إلى المفضلة!",
+            newsRemoved: "تمت إزالة الخبر من المفضلة.",
+            teamAdded: "تمت إضافة الفريق إلى المفضلة!",
+            teamRemoved: "تمت إزالة الفريق من المفضلة.",
+            addTeam: "أضف",
+            removeTeam: "إزالة",
+            notificationTitle: "إشعار من تطبيق كورة",
+            notificationBody: "هذا إشعار تجريبي لتطبيق كورة.",
+            notificationsPermission: "تفعيل الإشعارات",
+            notificationsEnabled: "تم تفعيل الإشعارات بنجاح.",
+            notificationsBlocked: "تم حظر الإشعارات. يرجى السماح بها من إعدادات المتصفح.",
+            searchPlaceholder: "ابحث عن الأخبار...",
+            teamDetails: "تفاصيل الفريق",
+            squad: "التشكيلة الأساسية",
+            stats: "إحصائيات",
+            matchesPlayed: "مباريات",
+            wins: "فوز",
+            draws: "تعادل",
+            losses: "هزيمة",
+            points: "نقاط",
+            totalGoals: "أهداف",
+            league: "الدوري",
+            favoriteTeamsTitle: "الفرق المفضلة",
+            favoriteNewsTitle: "الأخبار المفضلة",
+            goBack: "العودة للدوريات"
+        },
+        en: {
+            appTitle: "Kora App",
+            loginTitle: "Login",
+            registerTitle: "Register",
+            loginBtn: "Login",
+            registerBtn: "Register",
+            toggleToRegister: "Don't have an account? Register",
+            toggleToLogin: "Have an account? Login",
+            leagues: "Leagues",
+            news: "News",
+            matches: "Matches",
+            teams: "Teams",
+            favorites: "Favorites",
+            settings: "Settings",
+            leaguesPageTitle: "Leagues",
+            teamsPageTitle: "All Teams",
+            newsPageTitle: "Latest News",
+            matchesPageTitle: "Matches",
+            favoritesPageTitle: "Favorites",
+            settingsPageTitle: "Settings",
+            aboutAppTitle: "About Kora App",
+            aboutAppMessage: "Kora App is a simple web application for displaying football news and matches.",
+            shareSuccess: "App link copied successfully!",
+            loginSuccess: "Login successful!",
+            registerSuccess: "Registration successful!",
+            logoutSuccess: "Logout successful!",
+            emailRequired: "Email is required.",
+            passwordRequired: "Password is required.",
+            invalidCredentials: "Invalid email or password.",
+            userExists: "Account already exists. Please log in.",
+            noData: "No data available at the moment.",
+            upcomingMatch: "Upcoming Match",
+            finishedMatch: "Finished Match",
+            liveMatches: "Live Matches",
+            upcomingFinishedMatches: "Upcoming and Finished Matches",
+            noFavorites: "No items in favorites.",
+            newsAdded: "News added to favorites!",
+            newsRemoved: "News removed from favorites.",
+            teamAdded: "Team added to favorites!",
+            teamRemoved: "Team removed from favorites.",
+            addTeam: "Add",
+            removeTeam: "Remove",
+            notificationTitle: "Kora App Notification",
+            notificationBody: "This is a test notification from Kora App.",
+            notificationsPermission: "Enable Notifications",
+            notificationsEnabled: "Notifications enabled successfully.",
+            notificationsBlocked: "Notifications are blocked. Please allow them in your browser settings.",
+            searchPlaceholder: "Search for news...",
+            teamDetails: "Team Details",
+            squad: "Squad",
+            stats: "Stats",
+            matchesPlayed: "Matches Played",
+            wins: "Wins",
+            draws: "Draws",
+            losses: "Losses",
+            points: "Points",
+            totalGoals: "Total Goals",
+            league: "League",
+            favoriteTeamsTitle: "Favorite Teams",
+            favoriteNewsTitle: "Favorite News",
+            goBack: "Back to Leagues"
+        }
+    };
+
+    let currentLanguage = localStorage.getItem('appLang') || 'ar';
+    const appContainer = document.querySelector('.app-container');
+    const authPage = document.getElementById('auth-page');
+    const mainApp = document.getElementById('main-app');
+    const authForm = document.getElementById('auth-form-el');
+    const authTitle = document.getElementById('auth-title');
+    const authBtn = document.getElementById('auth-btn');
+    const toggleAuthLink = document.getElementById('toggle-auth');
+    const newsContainer = document.querySelector('.news-container');
+    const newsSearchInput = document.getElementById('news-search');
+    const liveMatchesContainer = document.getElementById('live-matches-container');
+    const upcomingMatchesContainer = document.getElementById('upcoming-matches-container');
+    const leaguesGrid = document.getElementById('leagues-grid');
+    const teamsByLeagueContainer = document.getElementById('teams-by-league-container');
+    const leagueTeamsTitle = document.getElementById('league-teams-title');
+    const goBackBtn = document.querySelector('.go-back');
+    const favoritesContainer = document.getElementById('favorites-container');
+    const noFavoritesMsg = document.getElementById('no-favorites-msg');
+    const themeToggle = document.getElementById('theme-toggle');
+    const languageSelect = document.getElementById('language-select');
+    const requestNotificationsBtn = document.getElementById('request-notifications');
+    const shareAppBtn = document.getElementById('share-app');
+    const aboutAppBtn = document.getElementById('about-app');
+    const logoutBtn = document.getElementById('logout');
+    const headerTitle = document.getElementById('header-title');
+    
+    // Modal elements
+    const teamModal = document.getElementById('team-modal');
+    const teamModalContent = document.getElementById('team-modal-content');
+    const closeModalBtn = document.querySelector('.close-btn');
+
+    let isRegisterMode = false;
+    let favoriteTeams = JSON.parse(localStorage.getItem('favoriteTeams')) || [];
+    let favoriteNews = JSON.parse(localStorage.getItem('favoriteNews')) || [];
+    
+    // Toast Message
+    function showToast(message, isError = false) {
+        const toastContainer = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.classList.add('toast');
+        if (isError) {
+            toast.classList.add('error');
+        }
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+        setTimeout(() => { toast.classList.add('show'); }, 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => { toastContainer.removeChild(toast); }, 300);
+        }, 3000);
+    }
+
+    // PWA Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            const swCode = `
+const CACHE_NAME = 'kora-app-cache-v1';
+const urlsToCache = [
+    './',
+    './index.html',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+];
+self.addEventListener('install', event => {
+    event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
+});
+self.addEventListener('fetch', event => {
+    event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
+});
+self.addEventListener('activate', event => {
+    const cacheWhitelist = [CACHE_NAME];
+    event.waitUntil(caches.keys().then(cacheNames => Promise.all(cacheNames.map(cacheName => {
+        if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+        }
+    }))));
+});
+`;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl)
+                .then(reg => console.log('Service Worker: Registered'))
+                .catch(err => console.error('Service Worker: Registration failed', err));
+        });
+    }
+    
+    // Notifications
+    requestNotificationsBtn.addEventListener('click', () => {
+        if (!('Notification' in window)) {
+            showToast(translations[currentLanguage].notificationsBlocked, true);
+            return;
+        }
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                showToast(translations[currentLanguage].notificationsEnabled);
+                new Notification(translations[currentLanguage].notificationTitle, {
+                    body: translations[currentLanguage].notificationBody
+                });
+            } else {
+                showToast(translations[currentLanguage].notificationsBlocked, true);
+            }
+        });
+    });
+
+    // Language Functions
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        localStorage.setItem('appLang', lang);
+        document.documentElement.lang = lang;
+        document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        updateUIForLanguage();
+    }
+
+    function updateUIForLanguage() {
+        const t = translations[currentLanguage];
+        // Auth page
+        authTitle.textContent = isRegisterMode ? t.registerTitle : t.loginTitle;
+        authBtn.textContent = isRegisterMode ? t.registerBtn : t.loginBtn;
+        toggleAuthLink.textContent = isRegisterMode ? t.toggleToLogin : t.toggleToRegister;
+        document.getElementById('email').placeholder = currentLanguage === 'ar' ? "البريد الإلكتروني" : "Email";
+        document.getElementById('password').placeholder = currentLanguage === 'ar' ? "كلمة المرور" : "Password";
+        // Main app
+        document.querySelector('[data-page="leagues-page"] span').textContent = t.leagues;
+        document.querySelector('[data-page="news-page"] span').textContent = t.news;
+        document.querySelector('[data-page="matches-page"] span').textContent = t.matches;
+        document.querySelector('[data-page="favorites-page"] span').textContent = t.favorites;
+        document.querySelector('[data-page="settings-page"] span').textContent = t.settings;
+        newsSearchInput.placeholder = t.searchPlaceholder;
+        document.getElementById('go-back-text').textContent = t.goBack;
+        const activePage = document.querySelector('.page.active');
+        if (activePage) {
+            updateHeaderTitle(activePage.id);
+        }
+        loadLeagues();
+        loadNews();
+        loadMatches();
+        loadFavorites();
+    }
+
+    function updateHeaderTitle(pageId) {
+        const t = translations[currentLanguage];
+        switch (pageId) {
+            case 'leagues-page': headerTitle.textContent = t.leaguesPageTitle; break;
+            case 'news-page': headerTitle.textContent = t.newsPageTitle; break;
+            case 'matches-page': headerTitle.textContent = t.matchesPageTitle; break;
+            case 'favorites-page': headerTitle.textContent = t.favoritesPageTitle; break;
+            case 'settings-page': headerTitle.textContent = t.settingsPageTitle; break;
+            case 'teams-by-league-page': headerTitle.textContent = document.getElementById('league-teams-title').textContent; break;
+        }
+    }
+
+    // Auth & User Management
+    function checkAuth() {
+        const user = localStorage.getItem('currentUser');
+        if (user) {
+            mainApp.style.display = 'block';
+            authPage.style.display = 'none';
+            const initialPage = document.querySelector('.page.active');
+            if (initialPage) {
+                initialPage.style.animation = 'fadeIn 0.5s ease-in-out';
+                updateHeaderTitle(initialPage.id);
+                loadLeagues();
+                loadNews();
+                loadMatches();
+                loadFavorites();
+            }
+        } else {
+            mainApp.style.display = 'none';
+            authPage.style.display = 'flex';
+        }
+    }
+
+    authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        if (!email || !password) {
+            showToast(translations[currentLanguage].emailRequired, true);
+            return;
+        }
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        if (isRegisterMode) {
+            const userExists = users.some(user => user.email === email);
+            if (userExists) {
+                showToast(translations[currentLanguage].userExists, true);
+            } else {
+                users.push({ email, password });
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('currentUser', JSON.stringify({ email }));
+                checkAuth();
+                showToast(translations[currentLanguage].registerSuccess);
+            }
+        } else {
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                localStorage.setItem('currentUser', JSON.stringify({ email }));
+                checkAuth();
+                showToast(translations[currentLanguage].loginSuccess);
+            } else {
+                showToast(translations[currentLanguage].invalidCredentials, true);
+            }
+        }
+    });
+
+    toggleAuthLink.addEventListener('click', () => {
+        isRegisterMode = !isRegisterMode;
+        updateUIForLanguage();
+    });
+
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('currentUser');
+        checkAuth();
+        showToast(translations[currentLanguage].logoutSuccess);
+    });
+    
+    // Pages & Navigation
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetPageId = item.getAttribute('data-page');
+            const targetPage = document.getElementById(targetPageId);
+            
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            targetPage.classList.add('active');
+            item.classList.add('active');
+            updateHeaderTitle(targetPageId);
+            
+            if (targetPageId === 'news-page') loadNews();
+            if (targetPageId === 'matches-page') loadMatches();
+            if (targetPageId === 'leagues-page') loadLeagues();
+            if (targetPageId === 'favorites-page') loadFavorites();
+        });
+    });
+
+    function goToTeamsByLeaguePage(leagueId) {
+        const selectedLeague = leaguesData.find(l => l.id === leagueId);
+        if (!selectedLeague) return;
+
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        document.getElementById('teams-by-league-page').classList.add('active');
         
-        <!-- About Page -->
-        <section id="about-page" class="page">
-            <div class="about container">
-                <h3>من نحن</h3>
-                <p>سلة طازة هي منصتك لشراء الخضروات والفواكه الطازجة وتوصيلها حتى باب منزلك بسرعة وجودة عالية.</p>
+        leagueTeamsTitle.textContent = selectedLeague.name[currentLanguage];
+        updateHeaderTitle('teams-by-league-page');
+        
+        teamsByLeagueContainer.innerHTML = '';
+        selectedLeague.teams.forEach(team => {
+            const isFavorite = favoriteTeams.some(fav => fav.id === team.id);
+            const teamItem = document.createElement('div');
+            teamItem.classList.add('team-item');
+            teamItem.dataset.teamId = team.id;
+            teamItem.innerHTML = `
+                <div class="team-details">
+                    <img src="${team.logo}" alt="${team.name[currentLanguage]} Logo">
+                    <span class="team-name">${team.name[currentLanguage]}</span>
+                </div>
+                <button class="${isFavorite ? 'remove' : ''}" onclick="event.stopPropagation(); toggleFavoriteTeam(${team.id})">
+                    ${isFavorite ? translations[currentLanguage].removeTeam : translations[currentLanguage].addTeam}
+                </button>
+            `;
+            teamsByLeagueContainer.appendChild(teamItem);
+            teamItem.addEventListener('click', () => showTeamDetails(team.id));
+        });
+    }
+
+    function goToLeaguesPage() {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        document.getElementById('leagues-page').classList.add('active');
+        const navItem = document.querySelector(`[data-page="leagues-page"]`);
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        navItem.classList.add('active');
+        updateHeaderTitle('leagues-page');
+    }
+
+    // Data Rendering & Functionality
+    function toggleFavoriteNews(newsId) {
+        const index = favoriteNews.findIndex(item => item.id === newsId);
+        if (index > -1) {
+            favoriteNews.splice(index, 1);
+            showToast(translations[currentLanguage].newsRemoved);
+        } else {
+            const newsItem = newsData.find(item => item.id === newsId);
+            if (newsItem) {
+                favoriteNews.push(newsItem);
+                showToast(translations[currentLanguage].newsAdded);
+            }
+        }
+        localStorage.setItem('favoriteNews', JSON.stringify(favoriteNews));
+        loadNews();
+        loadFavorites();
+    }
+    
+    function toggleFavoriteTeam(teamId) {
+        const index = favoriteTeams.findIndex(item => item.id === teamId);
+        if (index > -1) {
+            favoriteTeams.splice(index, 1);
+            showToast(translations[currentLanguage].teamRemoved);
+        } else {
+            const teamItem = allTeamsData.find(item => item.id === teamId);
+            if (teamItem) {
+                favoriteTeams.push(teamItem);
+                showToast(translations[currentLanguage].teamAdded);
+            }
+        }
+        localStorage.setItem('favoriteTeams', JSON.stringify(favoriteTeams));
+        // Reload teams on relevant pages
+        loadTeamsForActivePage();
+        loadFavorites();
+    }
+    
+    function loadTeamsForActivePage() {
+        const activePageId = document.querySelector('.page.active').id;
+        if (activePageId === 'teams-by-league-page') {
+            const leagueName = leagueTeamsTitle.textContent;
+            const selectedLeague = leaguesData.find(l => l.name[currentLanguage] === leagueName);
+            if(selectedLeague) {
+                goToTeamsByLeaguePage(selectedLeague.id);
+            }
+        }
+    }
+
+    function loadLeagues() {
+        leaguesGrid.innerHTML = '';
+        leaguesData.forEach(league => {
+            const leagueCard = document.createElement('div');
+            leagueCard.classList.add('league-card');
+            leagueCard.dataset.leagueId = league.id;
+            leagueCard.innerHTML = `
+                <img src="${league.logo}" alt="${league.name[currentLanguage]} Logo">
+                <h3>${league.name[currentLanguage]}</h3>
+            `;
+            leaguesGrid.appendChild(leagueCard);
+            leagueCard.addEventListener('click', () => goToTeamsByLeaguePage(league.id));
+        });
+    }
+
+    function showTeamDetails(teamId) {
+        const team = allTeamsData.find(t => t.id === teamId);
+        if (!team) return;
+
+        const t = translations[currentLanguage];
+        const teamDetailsHTML = `
+            <div class="team-modal-header">
+                <img src="${team.logo}" alt="${team.name[currentLanguage]} Logo">
+                <h3>${team.name[currentLanguage]}</h3>
             </div>
-        </section>
-
-        <!-- Login Page -->
-        <section id="login-page" class="page">
-            <div class="auth-container">
-                <form class="auth-form" id="login-form">
-                    <h2>تسجيل الدخول</h2>
-                    <div class="form-group">
-                        <label for="login-email">البريد الإلكتروني</label>
-                        <input type="email" id="login-email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="login-password">كلمة المرور</label>
-                        <input type="password" id="login-password" name="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">دخول</button>
-                    <p>ليس لديك حساب؟ <a onclick="showPage('signup')">إنشاء حساب جديد</a></p>
-                </form>
+            <div class="tab-container">
+                <div class="tab-item active" data-tab="squad">${t.squad}</div>
+                <div class="tab-item" data-tab="stats">${t.stats}</div>
             </div>
-        </section>
-
-        <!-- Signup Page -->
-        <section id="signup-page" class="page">
-            <div class="auth-container">
-                <form class="auth-form" id="signup-form">
-                    <h2>إنشاء حساب جديد</h2>
-                    <div class="form-group">
-                        <label for="signup-name">الاسم الكامل</label>
-                        <input type="text" id="signup-name" name="name" required>
+            <div id="squad-tab" class="tab-content active">
+                ${team.players.map(player => `
+                    <div class="player-item">
+                        <span class="player-name">${player.name[currentLanguage]}</span>
+                        <span class="player-position">${player.pos[currentLanguage]}</span>
                     </div>
-                    <div class="form-group">
-                        <label for="signup-email">البريد الإلكتروني</label>
-                        <input type="email" id="signup-email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signup-password">كلمة المرور</label>
-                        <input type="password" id="signup-password" name="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">إنشاء الحساب</button>
-                    <p>لديك حساب بالفعل؟ <a onclick="showPage('login')">تسجيل الدخول</a></p>
-                </form>
+                `).join('')}
             </div>
-        </section>
-    </main>
+            <div id="stats-tab" class="tab-content">
+                <div class="stat-row"><span>${t.league}</span><span>${team.league}</span></div>
+                <div class="stat-row"><span>${t.matchesPlayed}</span><span>${team.stats[currentLanguage].matches}</span></div>
+                <div class="stat-row"><span>${t.wins}</span><span>${team.stats[currentLanguage].wins}</span></div>
+                <div class="stat-row"><span>${t.draws}</span><span>${team.stats[currentLanguage].draws}</span></div>
+                <div class="stat-row"><span>${t.losses}</span><span>${team.stats[currentLanguage].losses}</span></div>
+                <div class="stat-row"><span>${t.points}</span><span>${team.stats[currentLanguage].points}</span></div>
+                <div class="stat-row"><span>${t.totalGoals}</span><span>${team.stats[currentLanguage].goals}</span></div>
+            </div>
+        `;
+        teamModalContent.innerHTML = teamDetailsHTML;
+        teamModal.style.display = 'flex';
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 سلة طازة. جميع الحقوق محفوظة.</p>
-        </div>
-    </footer>
-
-    <script>
-        const products = [
-            { id: 1, name: 'طماطم طازجة', price: '5 جنيه/كيلو', image: 'https://images.unsplash.com/photo-1561138241-942b8e21a2f1?w=400&q=80' },
-            { id: 2, name: 'خيار بلدي', price: '7 جنيه/كيلو', image: 'https://images.unsplash.com/photo-1582205041416-2d0016e6d1b4?w=400&q=80' },
-            { id: 3, name: 'تفاح أحمر', price: '20 جنيه/كيلو', image: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=400&q=80' },
-            { id: 4, name: 'موز', price: '15 جنيه/كيلو', image: 'https://images.unsplash.com/photo-1528825871115-3581a5387919?w=400&q=80' },
-        ];
-
-        function renderProducts() {
-            const productList = document.getElementById('product-list');
-            if (!productList) return;
-            productList.innerHTML = '';
-            products.forEach(product => {
-                const productCard = `
-                    <div class="product-card">
-                        <img src="${product.image}" alt="${product.name}">
-                        <h4>${product.name}</h4>
-                        <p class="price">${product.price}</p>
-                        <button class="btn">أضف للسلة</button>
-                    </div>
-                `;
-                productList.innerHTML += productCard;
+        const tabs = teamModalContent.querySelectorAll('.tab-item');
+        const tabContents = teamModalContent.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
             });
+        });
+    }
+
+    closeModalBtn.addEventListener('click', () => {
+        teamModal.style.display = 'none';
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target === teamModal) {
+            teamModal.style.display = 'none';
         }
+    });
 
-        function toggleMenu() {
-            const navLinks = document.getElementById('nav-links');
-            navLinks.classList.toggle('active');
+    function loadNews() {
+        const query = newsSearchInput.value.toLowerCase();
+        const filteredNews = newsData.filter(item => 
+            item.title[currentLanguage].toLowerCase().includes(query) ||
+            item.summary[currentLanguage].toLowerCase().includes(query)
+        );
+        newsContainer.innerHTML = '';
+        if (filteredNews.length === 0) {
+            newsContainer.innerHTML = `<p style="text-align: center; color: #999;">${translations[currentLanguage].noData}</p>`;
+            return;
         }
+        filteredNews.forEach(item => {
+            const isFavorite = favoriteNews.some(fav => fav.id === item.id);
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.style.animationDelay = `${filteredNews.indexOf(item) * 0.1}s`;
+            card.innerHTML = `
+                <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavoriteNews(${item.id})"><i class="fas fa-star"></i></button>
+                <img src="${item.image}" alt="News Image">
+                <h3>${item.title[currentLanguage]}</h3>
+                <p>${item.date}</p>
+                <p>${item.summary[currentLanguage]}</p>
+            `;
+            newsContainer.appendChild(card);
+        });
+    }
 
-        function showPage(pageId) {
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(page => page.classList.remove('active'));
-
-            const pageToShow = document.getElementById(pageId + '-page');
-            if (pageToShow) {
-                pageToShow.classList.add('active');
+    function loadFavorites() {
+        favoritesContainer.innerHTML = '<h2>' + translations[currentLanguage].favorites + '</h2>';
+        if (favoriteNews.length === 0 && favoriteTeams.length === 0) {
+            const noFavoritesMsg = document.createElement('p');
+            noFavoritesMsg.id = 'no-favorites-msg';
+            noFavoritesMsg.style.cssText = "text-align: center; color: #999;";
+            noFavoritesMsg.textContent = translations[currentLanguage].noFavorites;
+            favoritesContainer.appendChild(noFavoritesMsg);
+        } else {
+            // Display favorite teams
+            if (favoriteTeams.length > 0) {
+                const teamsTitle = document.createElement('h3');
+                teamsTitle.textContent = translations[currentLanguage].favoriteTeamsTitle;
+                favoritesContainer.appendChild(teamsTitle);
+                favoriteTeams.forEach(team => {
+                    const teamItem = document.createElement('div');
+                    teamItem.classList.add('team-item');
+                    teamItem.dataset.teamId = team.id;
+                    teamItem.innerHTML = `
+                        <div class="team-details">
+                            <img src="${team.logo}" alt="${team.name[currentLanguage]} Logo">
+                            <span class="team-name">${team.name[currentLanguage]}</span>
+                        </div>
+                        <button class="remove" onclick="event.stopPropagation(); toggleFavoriteTeam(${team.id})">
+                            ${translations[currentLanguage].removeTeam}
+                        </button>
+                    `;
+                    favoritesContainer.appendChild(teamItem);
+                    teamItem.addEventListener('click', () => showTeamDetails(team.id));
+                });
             }
             
-            const navLinkItems = document.querySelectorAll('#nav-links a');
-            navLinkItems.forEach(link => {
-                link.classList.remove('active-link');
-                if (link.getAttribute('onclick') === `showPage('${pageId}')`) {
-                    link.classList.add('active-link');
-                }
-            });
-
-            const navLinks = document.getElementById('nav-links');
-            if (navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
+            // Display favorite news
+            if (favoriteNews.length > 0) {
+                const newsTitle = document.createElement('h3');
+                newsTitle.textContent = translations[currentLanguage].favoriteNewsTitle;
+                favoritesContainer.appendChild(newsTitle);
+                favoriteNews.forEach(item => {
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+                    card.innerHTML = `
+                        <button class="favorite-btn active" onclick="toggleFavoriteNews(${item.id})"><i class="fas fa-star"></i></button>
+                        <img src="${item.image}" alt="News Image">
+                        <h3>${item.title[currentLanguage]}</h3>
+                        <p>${item.date}</p>
+                        <p>${item.summary[currentLanguage]}</p>
+                    `;
+                    favoritesContainer.appendChild(card);
+                });
             }
         }
-        
-        document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            localStorage.setItem('user', email);
-            updateNav();
-            alert('تم تسجيل الدخول بنجاح!');
-            showPage('home');
-        });
+    }
+    
+    newsSearchInput.addEventListener('input', loadNews);
 
-        document.getElementById('signup-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('signup-email').value;
-            localStorage.setItem('user', email);
-            updateNav();
-            alert('تم إنشاء الحساب بنجاح!');
-            showPage('home');
+    function loadMatches() {
+        const t = translations[currentLanguage];
+        liveMatchesContainer.innerHTML = '';
+        liveMatchesData.forEach(match => {
+            const card = document.createElement('div');
+            card.classList.add('live-card');
+            card.innerHTML = `
+                <p class="teams-names">${match.teams[0][currentLanguage]} vs ${match.teams[1][currentLanguage]}</p>
+                <p class="live-time">مباشر الآن</p>
+            `;
+            liveMatchesContainer.appendChild(card);
         });
         
-        function updateNav() {
-            const user = localStorage.getItem('user');
-            if (user) {
-                document.getElementById('login-link').style.display = 'none';
-                document.getElementById('logout-link').style.display = 'block';
-            } else {
-                document.getElementById('login-link').style.display = 'block';
-                document.getElementById('logout-link').style.display = 'none';
-            }
+        upcomingMatchesContainer.innerHTML = '';
+        matchesData.forEach(match => {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.style.animationDelay = `${matchesData.indexOf(match) * 0.1}s`;
+            const statusIcon = match.status === 'upcoming' ? '<i class="fas fa-clock"></i>' : '<i class="fas fa-check-circle"></i>';
+            const matchStatusText = match.status === 'upcoming' ? t.upcomingMatch : t.finishedMatch;
+            const scoreElement = match.status === 'finished' ? `<span class="score">${match.score[0]} - ${match.score[1]}</span>` : '';
+            card.innerHTML = `
+                <h3>${statusIcon} ${matchStatusText}</h3>
+                <div class="match-details">
+                    <div class="match-row">
+                        <span class="team-name">${match.teams[0][currentLanguage]}</span>
+                        ${match.status === 'finished' ? `<span class="score">${match.score[0]}</span>` : ''}
+                    </div>
+                    <div class="match-row">
+                        <span class="team-name">${match.teams[1][currentLanguage]}</span>
+                        ${match.status === 'finished' ? `<span class="score">${match.score[1]}</span>` : ''}
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 1rem;">${match.time[currentLanguage]}</p>
+            `;
+            upcomingMatchesContainer.appendChild(card);
+        });
+    }
+
+    // Settings Functionality
+    themeToggle.addEventListener('change', () => {
+        if (themeToggle.checked) {
+            appContainer.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            appContainer.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
+        }
+    });
+
+    languageSelect.addEventListener('change', (e) => {
+        setLanguage(e.target.value);
+    });
+
+    shareAppBtn.addEventListener('click', () => {
+        if (navigator.share) {
+            navigator.share({
+                title: translations[currentLanguage].appTitle,
+                text: translations[currentLanguage].aboutAppMessage,
+                url: window.location.href
+            }).catch(err => console.error('Share failed', err));
+        } else {
+            const dummyInput = document.createElement('input');
+            dummyInput.value = window.location.href;
+            document.body.appendChild(dummyInput);
+            dummyInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummyInput);
+            showToast(translations[currentLanguage].shareSuccess);
+        }
+    });
+
+    aboutAppBtn.addEventListener('click', () => {
+        const t = translations[currentLanguage];
+        showToast(t.aboutAppMessage);
+    });
+
+    // Initial Load
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (savedTheme === null && prefersDark)) {
+            appContainer.classList.add('dark-mode');
+            themeToggle.checked = true;
         }
 
-        function logout() {
-            localStorage.removeItem('user');
-            updateNav();
-            showPage('home');
+        const savedLang = localStorage.getItem('appLang');
+        if (savedLang) {
+            setLanguage(savedLang);
+            languageSelect.value = savedLang;
+        } else {
+            setLanguage('ar');
         }
-
-        window.onload = function() {
-            updateNav();
-            renderProducts();
-            showPage('home');
-        };
-    </script>
+        checkAuth();
+    });
+</script>
 </body>
 </html>
+
