@@ -2,9 +2,10 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>مشغل موسيقى محلي متطور</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="manifest" href="/manifest.json">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
         :root {
@@ -97,9 +98,10 @@
             pointer-events: none;
         }
         .main-container {
-            width: 100%;
-            max-width: 450px;
-            height: 600px;
+            width: 100vw;
+            height: 100vh;
+            max-width: 450px; /* يمكن إزالة هذا السطر إذا أردت ملء كامل العرض في الأجهزة الكبيرة */
+            max-height: 800px; /* يمكن إزالة هذا السطر إذا أردت ملء كامل الارتفاع في الأجهزة الكبيرة */
             position: relative;
             background-color: var(--card-color);
             border-radius: 20px;
@@ -108,6 +110,12 @@
             display: flex;
             flex-direction: column;
             backdrop-filter: blur(10px);
+        }
+        @media (min-width: 600px) {
+            .main-container {
+                width: 95%;
+                height: 95vh;
+            }
         }
         .page-container {
             flex-grow: 1;
@@ -228,7 +236,7 @@
             display: flex;
             gap: 10px;
         }
-        .song-card .remove-btn, .song-card .add-btn {
+        .song-card .remove-btn, .song-card .add-btn, .song-card .play-btn {
             background: none;
             border: none;
             color: var(--secondary-text-color);
@@ -237,7 +245,7 @@
             opacity: 0.7;
             margin-right: 10px;
         }
-        .song-card .remove-btn:hover, .song-card .add-btn:hover {
+        .song-card .remove-btn:hover, .song-card .add-btn:hover, .song-card .play-btn:hover {
             color: #d32f2f;
             opacity: 1;
         }
@@ -340,9 +348,9 @@
             border: none;
             border-radius: 15px;
             cursor: pointer;
-            transition: background-color 0.2s;
             font-family: 'Cairo', sans-serif;
             font-size: 0.9rem;
+            transition: background-color 0.2s;
         }
         .setting-item button:hover {
             background-color: #455a9b;
@@ -595,6 +603,59 @@
         #now-playing-page .extra-controls button.active {
             color: var(--primary-color);
         }
+        .dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            text-align: right;
+            backdrop-filter: blur(10px);
+        }
+        .dialog.visible {
+            display: flex;
+        }
+        .dialog h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .dialog input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            text-align: right;
+        }
+        .dialog-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        .dialog-buttons button {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem;
+        }
+        .dialog-buttons .confirm {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .dialog-buttons .cancel {
+            background-color: #ccc;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -628,10 +689,10 @@
                         <span>الألبومات</span>
                     </button>
                 </div>
-                <input type="file" id="file-input" multiple accept="audio/*">
                 <label for="file-input" class="file-upload-btn">
                     <i class="fas fa-plus"></i> إضافة ملفات صوتية
                 </label>
+                <input type="file" id="file-input" multiple accept="audio/*" style="display: none;">
                 <input type="text" id="search-box" placeholder="ابحث عن أغنية...">
                 <ul id="playlist" class="content-list"></ul>
             </div>
@@ -661,6 +722,16 @@
                     </button>
                 </div>
                 <ul id="playlists-list" class="content-list"></ul>
+            </div>
+            <div id="playlist-content-page" class="page hidden">
+                <div class="header">
+                    <button class="back-btn" id="back-from-playlist-content-btn" title="العودة"><i class="fas fa-arrow-right"></i></button>
+                    <h1 id="playlist-content-title"></h1>
+                    <button id="play-all-playlist-btn" class="play-all-btn">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+                <ul id="playlist-content-list" class="content-list"></ul>
             </div>
             <div id="settings-page" class="page hidden">
                 <div class="header">
@@ -758,6 +829,36 @@
             </div>
         </div>
     </div>
+
+    <div id="add-to-playlist-dialog" class="dialog">
+        <h3>إضافة إلى قائمة تشغيل</h3>
+        <ul id="add-to-playlist-list" class="content-list"></ul>
+        <div class="dialog-buttons">
+            <button class="cancel" id="cancel-add-to-playlist">إلغاء</button>
+        </div>
+    </div>
+    
+    <div id="create-playlist-dialog" class="dialog">
+        <h3>إنشاء قائمة تشغيل جديدة</h3>
+        <input type="text" id="new-playlist-name-input" placeholder="اسم قائمة التشغيل">
+        <div class="dialog-buttons">
+            <button class="confirm" id="confirm-create-playlist">إنشاء</button>
+            <button class="cancel" id="cancel-create-playlist">إلغاء</button>
+        </div>
+    </div>
+
+    <div id="edit-song-dialog" class="dialog">
+        <h3>تعديل بيانات الأغنية</h3>
+        <label for="edit-title-input">العنوان:</label>
+        <input type="text" id="edit-title-input">
+        <label for="edit-artist-input">الفنان:</label>
+        <input type="text" id="edit-artist-input">
+        <div class="dialog-buttons">
+            <button class="confirm" id="save-edit-btn">حفظ</button>
+            <button class="cancel" id="cancel-edit-btn">إلغاء</button>
+        </div>
+    </div>
+
     <audio id="audio-player"></audio>
     <script src="https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js"></script>
     <script>
@@ -799,62 +900,89 @@
         const repeatBtn = document.getElementById('repeat-btn');
         const shuffleBtn = document.getElementById('shuffle-btn');
         const sleepTimerSelect = document.getElementById('sleep-timer-select');
-        let playlist = JSON.parse(localStorage.getItem('myPlaylist')) || [];
+        const addToPlaylistDialog = document.getElementById('add-to-playlist-dialog');
+        const addToPlaylistListEl = document.getElementById('add-to-playlist-list');
+        const cancelAddToPlaylistBtn = document.getElementById('cancel-add-to-playlist');
+        const editSongDialog = document.getElementById('edit-song-dialog');
+        const editTitleInput = document.getElementById('edit-title-input');
+        const editArtistInput = document.getElementById('edit-artist-input');
+        const saveEditBtn = document.getElementById('save-edit-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        const playlistContentPage = document.getElementById('playlist-content-page');
+        const playlistContentTitle = document.getElementById('playlist-content-title');
+        const playlistContentListEl = document.getElementById('playlist-content-list');
+        const backFromPlaylistContentBtn = document.getElementById('back-from-playlist-content-btn');
+        const playAllPlaylistBtn = document.getElementById('play-all-playlist-btn');
+        const createPlaylistDialog = document.getElementById('create-playlist-dialog');
+        const newPlaylistNameInput = document.getElementById('new-playlist-name-input');
+        const confirmCreatePlaylistBtn = document.getElementById('confirm-create-playlist');
+        const cancelCreatePlaylistBtn = document.getElementById('cancel-create-playlist');
+
+        let playlist = [];
         let playlists = JSON.parse(localStorage.getItem('myPlaylists')) || [];
-        let currentSongIndex = localStorage.getItem('currentSongIndex') ? parseInt(localStorage.getItem('currentSongIndex')) : -1;
+        let currentSongIndex = -1;
         let isPlaying = false;
         let originalPlaylist = [];
         let shuffledPlaylist = [];
         let isShuffling = false;
         let repeatMode = 0; // 0: No repeat, 1: Repeat All, 2: Repeat One
         let sleepTimerId = null;
-        let draggedItem = null;
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = Math.floor(seconds % 60);
-            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-        }
-        function updateUI() {
-            if (playlist.length === 0) {
-                playerBar.classList.remove('visible');
-                nowPlayingTitleEl.textContent = 'لا يوجد أغنية قيد التشغيل';
-                nowPlayingArtistEl.textContent = 'غير معروف';
-                nowPlayingImageEl.src = 'https://i.imgur.com/u7q6K6e.png';
-                return;
-            }
-            const currentSong = playlist[currentSongIndex];
-            const songImageSrc = currentSong.image || 'https://i.imgur.com/u7q6K6e.png';
-            playerBarTitleEl.textContent = currentSong.title || currentSong.name;
-            playerBarArtistEl.textContent = currentSong.artist || 'غير معروف';
-            playerBarImageEl.src = songImageSrc;
-            nowPlayingTitleEl.textContent = currentSong.title || currentSong.name;
-            nowPlayingArtistEl.textContent = currentSong.artist || 'غير معروف';
-            nowPlayingImageEl.src = songImageSrc;
-            playerBarPlayPauseBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
-            fullPlayerPlayPauseBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
-            playerBar.classList.add('visible');
-            const playlistItems = document.querySelectorAll('#playlist li');
-            playlistItems.forEach((item, index) => {
-                const song = playlist[index];
-                if (song && song.name === currentSong.name) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
+        let currentPlayingList = [];
+        let db;
+        let selectedSongForEdit = null;
+
+        function openDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('musicPlayerDB', 1);
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+                    if (!db.objectStoreNames.contains('songs')) {
+                        const songStore = db.createObjectStore('songs', { keyPath: 'id' });
+                        songStore.createIndex('by_artist', 'artist', { unique: false });
+                        songStore.createIndex('by_album', 'album', { unique: false });
+                    }
+                    if (!db.objectStoreNames.contains('files')) {
+                        db.createObjectStore('files', { keyPath: 'id' });
+                    }
+                };
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    resolve(db);
+                };
+                request.onerror = (event) => {
+                    console.error('Database error:', event.target.error);
+                    reject(event.target.error);
+                };
             });
         }
+
+        async function loadSongsFromDB() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction('songs', 'readonly');
+                const store = transaction.objectStore('songs');
+                const request = store.getAll();
+                request.onsuccess = (event) => {
+                    playlist = event.target.result;
+                    originalPlaylist = [...playlist];
+                    resolve(playlist);
+                };
+                request.onerror = (event) => {
+                    console.error('Error loading songs:', event.target.error);
+                    reject(event.target.error);
+                };
+            });
+        }
+
         function saveState() {
-            localStorage.setItem('myPlaylist', JSON.stringify(playlist.map(song => ({
-                name: song.name,
-                title: song.title,
-                artist: song.artist,
-                album: song.album || '',
-                image: song.image || ''
-            }))));
             localStorage.setItem('myPlaylists', JSON.stringify(playlists));
             localStorage.setItem('currentSongIndex', currentSongIndex);
         }
-        function getFileMetadata(file) {
+
+        function generateId() {
+            return Math.random().toString(36).substr(2, 9);
+        }
+
+        async function getFileMetadata(file) {
             return new Promise((resolve) => {
                 jsmediatags.read(file, {
                     onSuccess: (tag) => {
@@ -867,32 +995,90 @@
                             const url = `data:${picture.format};base64,${btoa(String.fromCharCode.apply(null, picture.data))}`;
                             image = url;
                         }
-                        resolve({ name: file.name, file: file, title: title, artist: artist, album: album, image: image });
+                        resolve({ id: generateId(), name: file.name, title: title, artist: artist, album: album, image: image });
                     },
                     onError: () => {
-                        resolve({ name: file.name, file: file, title: file.name.split('.').slice(0, -1).join('.') });
+                        resolve({ id: generateId(), name: file.name, title: file.name.split('.').slice(0, -1).join('.') });
                     }
                 });
             });
         }
-        async function loadSong(index) {
-            if (index < 0 || index >= playlist.length) return;
+
+        async function loadSong(index, sourceList = playlist) {
+            if (index < 0 || index >= sourceList.length) return;
+            currentPlayingList = sourceList;
             currentSongIndex = index;
-            const song = playlist[currentSongIndex];
-            if (!song.file || !(song.file instanceof File)) {
-                playerBarTitleEl.textContent = `خطأ في تحميل: ${song.title || song.name}`;
-                playerBarArtistEl.textContent = 'الرجاء إعادة إضافة الملفات.';
-                audioPlayer.pause();
+            const song = currentPlayingList[currentSongIndex];
+            
+            const transaction = db.transaction('files', 'readonly');
+            const store = transaction.objectStore('files');
+            const request = store.get(song.id);
+            
+            loadingSpinner.style.display = 'block';
+            
+            request.onsuccess = (event) => {
+                const file = event.target.result?.file;
+                if (file) {
+                    audioPlayer.src = URL.createObjectURL(file);
+                    audioPlayer.oncanplaythrough = () => {
+                        playSong();
+                        updateUI();
+                        loadingSpinner.style.display = 'none';
+                        saveState();
+                        URL.revokeObjectURL(audioPlayer.src);
+                    };
+                } else {
+                    alert('الملف غير موجود في قاعدة البيانات، يرجى إضافته مرة أخرى.');
+                    loadingSpinner.style.display = 'none';
+                }
+            };
+            request.onerror = (event) => {
+                console.error('Error loading file from DB:', event.target.error);
+                alert('حدث خطأ في تحميل الملف.');
+                loadingSpinner.style.display = 'none';
+            };
+        }
+
+        function updateUI() {
+            if (currentPlayingList.length === 0 || currentSongIndex === -1) {
+                playerBar.classList.remove('visible');
+                nowPlayingTitleEl.textContent = 'لا يوجد أغنية قيد التشغيل';
+                nowPlayingArtistEl.textContent = 'غير معروف';
+                nowPlayingImageEl.src = 'https://i.imgur.com/u7q6K6e.png';
                 return;
             }
-            audioPlayer.src = URL.createObjectURL(song.file);
-            loadingSpinner.style.display = 'block';
-            await new Promise(resolve => audioPlayer.addEventListener('canplaythrough', resolve, { once: true }));
-            playSong();
-            updateUI();
-            saveState();
-            loadingSpinner.style.display = 'none';
+            const currentSong = currentPlayingList[currentSongIndex];
+            const songImageSrc = currentSong.image || 'https://i.imgur.com/u7q6K6e.png';
+            playerBarTitleEl.textContent = currentSong.title || currentSong.name;
+            playerBarArtistEl.textContent = currentSong.artist || 'غير معروف';
+            playerBarImageEl.src = songImageSrc;
+            nowPlayingTitleEl.textContent = currentSong.title || currentSong.name;
+            nowPlayingArtistEl.textContent = currentSong.artist || 'غير معروف';
+            nowPlayingImageEl.src = songImageSrc;
+            playerBarPlayPauseBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+            fullPlayerPlayPauseBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+            playerBar.classList.add('visible');
+            const allSongCards = document.querySelectorAll('.song-card');
+            allSongCards.forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.id === currentSong.id) {
+                    item.classList.add('active');
+                }
+            });
         }
+
+        function playSong() {
+            audioPlayer.play();
+            isPlaying = true;
+            updateUI();
+        }
+
+        function pauseSong() {
+            audioPlayer.pause();
+            isPlaying = false;
+            updateUI();
+        }
+
         function togglePlayPause() {
             if (audioPlayer.paused) {
                 playSong();
@@ -900,54 +1086,47 @@
                 pauseSong();
             }
         }
-        function playSong() {
-            audioPlayer.play();
-            isPlaying = true;
-            updateUI();
-        }
-        function pauseSong() {
-            audioPlayer.pause();
-            isPlaying = false;
-            updateUI();
-        }
+
         function nextSong() {
-            if (playlist.length === 0) return;
+            if (currentPlayingList.length === 0) return;
             let nextIndex = 0;
             if (isShuffling) {
-                const currentShuffledIndex = shuffledPlaylist.findIndex(s => s.name === playlist[currentSongIndex].name);
+                const currentShuffledIndex = shuffledPlaylist.findIndex(s => s.id === currentPlayingList[currentSongIndex].id);
                 let newIndex = currentShuffledIndex + 1;
                 if (newIndex >= shuffledPlaylist.length) {
                     newIndex = 0;
                 }
-                const nextSongName = shuffledPlaylist[newIndex].name;
-                nextIndex = playlist.findIndex(s => s.name === nextSongName);
+                const nextSongId = shuffledPlaylist[newIndex].id;
+                nextIndex = currentPlayingList.findIndex(s => s.id === nextSongId);
             } else {
                 nextIndex = currentSongIndex + 1;
-                if (nextIndex >= playlist.length) {
+                if (nextIndex >= currentPlayingList.length) {
                     nextIndex = 0;
                 }
             }
-            loadSong(nextIndex);
+            loadSong(nextIndex, currentPlayingList);
         }
+
         function prevSong() {
-            if (playlist.length === 0) return;
+            if (currentPlayingList.length === 0) return;
             let prevIndex = 0;
             if (isShuffling) {
-                const currentShuffledIndex = shuffledPlaylist.findIndex(s => s.name === playlist[currentSongIndex].name);
+                const currentShuffledIndex = shuffledPlaylist.findIndex(s => s.id === currentPlayingList[currentSongIndex].id);
                 let newIndex = currentShuffledIndex - 1;
                 if (newIndex < 0) {
                     newIndex = shuffledPlaylist.length - 1;
                 }
-                const prevSongName = shuffledPlaylist[newIndex].name;
-                prevIndex = playlist.findIndex(s => s.name === prevSongName);
+                const prevSongId = shuffledPlaylist[newIndex].id;
+                prevIndex = currentPlayingList.findIndex(s => s.id === prevSongId);
             } else {
                 prevIndex = currentSongIndex - 1;
                 if (prevIndex < 0) {
-                    prevIndex = playlist.length - 1;
+                    prevIndex = currentPlayingList.length - 1;
                 }
             }
-            loadSong(prevIndex);
+            loadSong(prevIndex, currentPlayingList);
         }
+
         function toggleRepeat() {
             repeatMode = (repeatMode + 1) % 3;
             repeatBtn.classList.remove('active');
@@ -959,15 +1138,17 @@
                 repeatBtn.innerHTML = '<i class="fas fa-redo-alt"></i>';
             }
         }
+
         function toggleShuffle() {
             isShuffling = !isShuffling;
             if (isShuffling) {
-                shuffledPlaylist = [...playlist].sort(() => Math.random() - 0.5);
+                shuffledPlaylist = [...currentPlayingList].sort(() => Math.random() - 0.5);
                 shuffleBtn.classList.add('active');
             } else {
                 shuffleBtn.classList.remove('active');
             }
         }
+
         function setSleepTimer(minutes) {
             clearTimeout(sleepTimerId);
             if (minutes > 0) {
@@ -980,12 +1161,17 @@
                 alert(`تم ضبط مؤقت الإيقاف على ${minutes} دقيقة.`);
             }
         }
-        function renderPlaylist(filteredList = playlist) {
-            playlistEl.innerHTML = '';
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+        function renderPlaylist(filteredList = playlist, targetEl = playlistEl) {
+            targetEl.innerHTML = '';
             filteredList.forEach((song) => {
                 const li = document.createElement('li');
                 li.className = 'song-card';
-                const imageSrc = song.image ? song.image : 'https://i.imgur.com/u7q6K6e.png';
+                const imageSrc = song.image || 'https://i.imgur.com/u7q6K6e.png';
                 li.innerHTML = `
                     <img src="${imageSrc}" class="song-image" alt="Album Art">
                     <div class="song-info">
@@ -993,30 +1179,34 @@
                         <p>${song.artist}</p>
                     </div>
                     <div class="action-buttons">
+                        <button class="edit-btn" title="تعديل"><i class="fas fa-edit"></i></button>
                         <button class="add-btn" title="إضافة إلى قائمة تشغيل"><i class="fas fa-plus-square"></i></button>
                         <button class="remove-btn" title="حذف الأغنية"><i class="fas fa-trash-can"></i></button>
                     </div>
                 `;
-                li.setAttribute('draggable', 'true');
-                li.dataset.songName = song.name;
+                li.dataset.id = song.id;
                 li.addEventListener('click', (e) => {
-                    if (e.target.closest('.remove-btn') || e.target.closest('.add-btn')) return;
-                    const originalIndex = playlist.findIndex(s => s.name === song.name);
+                    if (e.target.closest('.remove-btn') || e.target.closest('.add-btn') || e.target.closest('.edit-btn')) return;
+                    const originalIndex = playlist.findIndex(s => s.id === song.id);
                     loadSong(originalIndex);
+                });
+                li.querySelector('.edit-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showEditSongDialog(song);
                 });
                 li.querySelector('.remove-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const indexToRemove = playlist.findIndex(s => s.name === song.name);
-                    removeSong(indexToRemove);
+                    removeSong(song.id);
                 });
                 li.querySelector('.add-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
-                    showAddToListDialog(song);
+                    showAddToPlaylistDialog(song);
                 });
-                playlistEl.appendChild(li);
+                targetEl.appendChild(li);
             });
             updateUI();
         }
+
         function renderPlaylists() {
             playlistsListEl.innerHTML = '';
             playlists.forEach((pl, index) => {
@@ -1031,7 +1221,7 @@
                 `;
                 li.addEventListener('click', (e) => {
                     if (e.target.closest('.remove-btn')) return;
-                    alert(`عرض أغاني قائمة التشغيل: ${pl.name}`);
+                    showPlaylistContent(pl);
                 });
                 li.querySelector('.remove-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -1044,142 +1234,212 @@
                 playlistsListEl.appendChild(li);
             });
         }
-        function showAddToListDialog(song) {
-            const listNames = playlists.map(pl => pl.name);
-            if (listNames.length === 0) {
+
+        function showPlaylistContent(playlistObj) {
+            playlistContentTitle.textContent = playlistObj.name;
+            showPage('playlist-content-page');
+            playlistContentListEl.innerHTML = '';
+            playlistObj.songs.forEach(songId => {
+                const song = playlist.find(s => s.id === songId);
+                if (song) {
+                    const li = document.createElement('li');
+                    li.className = 'song-card';
+                    const imageSrc = song.image || 'https://i.imgur.com/u7q6K6e.png';
+                    li.innerHTML = `
+                        <img src="${imageSrc}" class="song-image" alt="Album Art">
+                        <div class="song-info">
+                            <h4>${song.title}</h4>
+                            <p>${song.artist}</p>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="remove-btn" title="حذف الأغنية"><i class="fas fa-trash-can"></i></button>
+                        </div>
+                    `;
+                    li.dataset.id = song.id;
+                    li.addEventListener('click', (e) => {
+                        if (e.target.closest('.remove-btn')) return;
+                        const originalIndex = playlist.findIndex(s => s.id === song.id);
+                        loadSong(originalIndex);
+                    });
+                    li.querySelector('.remove-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        playlistObj.songs = playlistObj.songs.filter(id => id !== song.id);
+                        saveState();
+                        showPlaylistContent(playlistObj);
+                    });
+                    playlistContentListEl.appendChild(li);
+                }
+            });
+            playAllPlaylistBtn.onclick = () => {
+                const songsToPlay = playlistObj.songs.map(songId => playlist.find(s => s.id === songId)).filter(Boolean);
+                if (songsToPlay.length > 0) {
+                    currentPlayingList = songsToPlay;
+                    loadSong(0, currentPlayingList);
+                    showPage('now-playing-page');
+                }
+            };
+        }
+
+        function showAddToPlaylistDialog(song) {
+            if (playlists.length === 0) {
                 alert('لا توجد قوائم تشغيل متاحة. قم بإنشاء قائمة تشغيل أولاً.');
                 return;
             }
-            const selectedList = prompt(`اختر قائمة لإضافة "${song.title}" إليها:\n${listNames.map((name, i) => `${i + 1}. ${name}`).join('\n')}`);
-            if (selectedList) {
-                const index = parseInt(selectedList) - 1;
-                if (index >= 0 && index < playlists.length) {
-                    playlists[index].songs.push(song);
-                    saveState();
-                    alert('تم الإضافة بنجاح!');
-                    renderPlaylists();
-                } else {
-                    alert('اختيار غير صالح.');
+            addToPlaylistListEl.innerHTML = '';
+            playlists.forEach(pl => {
+                const li = document.createElement('li');
+                li.className = 'song-card';
+                li.innerHTML = `<h4>${pl.name}</h4>`;
+                li.addEventListener('click', () => {
+                    if (!pl.songs.includes(song.id)) {
+                        pl.songs.push(song.id);
+                        saveState();
+                        alert('تم الإضافة بنجاح!');
+                    } else {
+                        alert('الأغنية موجودة بالفعل في هذه القائمة.');
+                    }
+                    hideDialog(addToPlaylistDialog);
+                });
+                addToPlaylistListEl.appendChild(li);
+            });
+            showDialog(addToPlaylistDialog);
+        }
+
+        function showEditSongDialog(song) {
+            selectedSongForEdit = song;
+            editTitleInput.value = song.title;
+            editArtistInput.value = song.artist;
+            showDialog(editSongDialog);
+        }
+
+        function createNewPlaylist() {
+            showDialog(createPlaylistDialog);
+        }
+
+        async function removeSong(songId) {
+            if (confirm('هل أنت متأكد من حذف هذه الأغنية من مكتبتك؟')) {
+                const indexToRemove = playlist.findIndex(s => s.id === songId);
+                if (indexToRemove !== -1) {
+                    if (currentSongIndex === indexToRemove) {
+                        pauseSong();
+                        audioPlayer.src = '';
+                    }
+                    
+                    const transaction = db.transaction(['songs', 'files'], 'readwrite');
+                    const songStore = transaction.objectStore('songs');
+                    const fileStore = transaction.objectStore('files');
+                    
+                    try {
+                        await songStore.delete(songId);
+                        await fileStore.delete(songId);
+                        
+                        playlist.splice(indexToRemove, 1);
+                        if (currentSongIndex > indexToRemove) {
+                            currentSongIndex--;
+                        } else if (currentSongIndex === indexToRemove) {
+                            currentSongIndex = -1;
+                        }
+                        
+                        playlists.forEach(pl => {
+                            pl.songs = pl.songs.filter(id => id !== songId);
+                        });
+                        
+                        saveState();
+                        renderPlaylist();
+                        renderArtistsAndAlbums();
+                        renderPlaylists();
+                        updateUI();
+                    } catch (error) {
+                        console.error('Error removing song:', error);
+                        alert('حدث خطأ أثناء حذف الأغنية.');
+                    }
                 }
             }
         }
-        function createNewPlaylist() {
-            const name = prompt('أدخل اسم قائمة التشغيل الجديدة:');
-            if (name && name.trim() !== '') {
-                playlists.push({ name: name, songs: [] });
-                saveState();
-                renderPlaylists();
-            }
-        }
-        function removeSong(index) {
-            if (index < 0 || index >= playlist.length) return;
-            if (index === currentSongIndex) {
-                pauseSong();
-                audioPlayer.src = '';
-            }
-            const songName = playlist[index].name;
-            playlist.splice(index, 1);
-            originalPlaylist = [...playlist];
-            if (currentSongIndex > index) {
-                currentSongIndex--;
-            } else if (currentSongIndex === index) {
-                currentSongIndex = -1;
-            }
-            playlists.forEach(pl => {
-                pl.songs = pl.songs.filter(s => s.name !== songName);
-            });
-            renderPlaylist();
-            renderArtistsAndAlbums();
-            renderPlaylists();
-            updateUI();
-            saveState();
-        }
-        function renderArtistsAndAlbums() {
+
+        async function renderArtistsAndAlbums() {
             const artists = {};
             const albums = {};
-            playlist.forEach(song => {
-                const artist = song.artist || 'غير معروف';
-                const album = song.album || 'غير معروف';
-                if (!artists[artist]) {
-                    artists[artist] = [];
+            
+            const transaction = db.transaction('songs', 'readonly');
+            const store = transaction.objectStore('songs');
+            const cursorRequest = store.openCursor();
+            
+            cursorRequest.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    const song = cursor.value;
+                    const artist = song.artist || 'غير معروف';
+                    const album = song.album || 'غير معروف';
+                    
+                    artists[artist] = (artists[artist] || 0) + 1;
+                    albums[album] = (albums[album] || 0) + 1;
+                    
+                    cursor.continue();
+                } else {
+                    artistsListEl.innerHTML = '';
+                    Object.keys(artists).forEach(artistName => {
+                        const li = document.createElement('li');
+                        li.className = 'song-card';
+                        li.innerHTML = `<h4>${artistName}</h4><p>${artists[artistName]} أغنية</p>`;
+                        li.addEventListener('click', () => {
+                            alert(`عرض أغاني الفنان ${artistName}.`);
+                        });
+                        artistsListEl.appendChild(li);
+                    });
+                    
+                    albumsListEl.innerHTML = '';
+                    Object.keys(albums).forEach(albumName => {
+                        const li = document.createElement('li');
+                        li.className = 'song-card';
+                        li.innerHTML = `<h4>${albumName}</h4><p>${albums[albumName]} أغنية</p>`;
+                        li.addEventListener('click', () => {
+                            alert(`عرض أغاني الألبوم ${albumName}.`);
+                        });
+                        albumsListEl.appendChild(li);
+                    });
                 }
-                artists[artist].push(song);
-                if (!albums[album]) {
-                    albums[album] = [];
+            };
+        }
+
+        async function setupFileHandling() {
+            fileInput.addEventListener('change', async (e) => {
+                const files = e.target.files;
+                if (files.length === 0) return;
+                loadingSpinner.style.display = 'block';
+                const transaction = db.transaction(['songs', 'files'], 'readwrite');
+                const songStore = transaction.objectStore('songs');
+                const fileStore = transaction.objectStore('files');
+                
+                let newSongs = [];
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (file.type.startsWith('audio/')) {
+                        const metadata = await getFileMetadata(file);
+                        const songData = { ...metadata, file: file };
+                        songStore.add(metadata);
+                        fileStore.add({ id: metadata.id, file: file });
+                        newSongs.push(metadata);
+                    }
                 }
-                albums[album].push(song);
-            });
-            artistsListEl.innerHTML = '';
-            Object.keys(artists).forEach(artistName => {
-                const li = document.createElement('li');
-                li.className = 'song-card';
-                li.innerHTML = `<h4>${artistName}</h4><p>${artists[artistName].length} أغنية</p>`;
-                li.addEventListener('click', () => {
-                    alert(`عرض أغاني الفنان ${artistName}.`);
-                });
-                artistsListEl.appendChild(li);
-            });
-            albumsListEl.innerHTML = '';
-            Object.keys(albums).forEach(albumName => {
-                const li = document.createElement('li');
-                li.className = 'song-card';
-                li.innerHTML = `<h4>${albumName}</h4><p>${albums[albumName].length} أغنية</p>`;
-                li.addEventListener('click', () => {
-                    alert(`عرض أغاني الألبوم ${albumName}.`);
-                });
-                albumsListEl.appendChild(li);
+                
+                transaction.oncomplete = () => {
+                    playlist.push(...newSongs);
+                    originalPlaylist = [...playlist];
+                    renderPlaylist();
+                    renderArtistsAndAlbums();
+                    if (currentSongIndex === -1 && playlist.length > 0) {
+                        loadSong(0);
+                    }
+                    loadingSpinner.style.display = 'none';
+                    saveState();
+                };
+                transaction.onerror = (event) => {
+                    console.error('Transaction error:', event.target.error);
+                    loadingSpinner.style.display = 'none';
+                };
             });
         }
-        playlistEl.addEventListener('dragstart', (e) => {
-            draggedItem = e.target;
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', null);
-        });
-        playlistEl.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            const target = e.target.closest('.song-card');
-            if (target && target !== draggedItem) {
-                const rect = target.getBoundingClientRect();
-                const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
-                playlistEl.insertBefore(draggedItem, next && target.nextSibling || target);
-            }
-        });
-        playlistEl.addEventListener('drop', (e) => {
-            e.preventDefault();
-            if (draggedItem) {
-                const oldIndex = Array.from(playlistEl.children).indexOf(draggedItem);
-                const newIndex = Array.from(playlistEl.children).indexOf(draggedItem);
-                const [movedSong] = playlist.splice(oldIndex, 1);
-                playlist.splice(newIndex, 0, movedSong);
-                originalPlaylist = [...playlist];
-                currentSongIndex = newIndex;
-                updateUI();
-                saveState();
-            }
-            draggedItem = null;
-        });
-        playlistEl.addEventListener('dragend', () => {
-            draggedItem = null;
-        });
-        fileInput.addEventListener('change', async (e) => {
-            const files = e.target.files;
-            if (files.length === 0) return;
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                if (file.type.startsWith('audio/')) {
-                    const metadata = await getFileMetadata(file);
-                    metadata.file = file;
-                    playlist.push(metadata);
-                }
-            }
-            originalPlaylist = [...playlist];
-            renderPlaylist();
-            renderArtistsAndAlbums();
-            if (currentSongIndex === -1 && playlist.length > 0) {
-                loadSong(0);
-            }
-            saveState();
-        });
         audioPlayer.addEventListener('timeupdate', () => {
             const { currentTime, duration } = audioPlayer;
             const progressPercent = (currentTime / duration) * 100;
@@ -1237,12 +1497,17 @@
                 activePage.classList.add('active');
             }
             navItems.forEach(item => {
+                item.classList.remove('active');
                 if (item.dataset.page === pageId) {
                     item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
                 }
             });
+        }
+        function showDialog(dialogEl) {
+            dialogEl.classList.add('visible');
+        }
+        function hideDialog(dialogEl) {
+            dialogEl.classList.remove('visible');
         }
         navItems.forEach(item => {
             item.addEventListener('click', () => {
@@ -1266,7 +1531,57 @@
         backFromSettingsBtn.addEventListener('click', () => showPage('home-page'));
         backFromPlaylistsBtn.addEventListener('click', () => showPage('home-page'));
         backFromNowPlayingBtn.addEventListener('click', () => showPage('home-page'));
+        backFromPlaylistContentBtn.addEventListener('click', () => showPage('playlists-page'));
         createPlaylistBtn.addEventListener('click', createNewPlaylist);
+        cancelAddToPlaylistBtn.addEventListener('click', () => hideDialog(addToPlaylistDialog));
+        saveEditBtn.addEventListener('click', async () => {
+            if (selectedSongForEdit) {
+                const newTitle = editTitleInput.value;
+                const newArtist = editArtistInput.value;
+                const songId = selectedSongForEdit.id;
+                
+                const transaction = db.transaction('songs', 'readwrite');
+                const store = transaction.objectStore('songs');
+                const request = store.get(songId);
+                
+                request.onsuccess = (event) => {
+                    const song = event.target.result;
+                    if (song) {
+                        song.title = newTitle;
+                        song.artist = newArtist;
+                        store.put(song);
+                        
+                        const index = playlist.findIndex(s => s.id === songId);
+                        if (index !== -1) {
+                            playlist[index].title = newTitle;
+                            playlist[index].artist = newArtist;
+                            updateUI();
+                        }
+                        
+                        renderPlaylist();
+                        renderArtistsAndAlbums();
+                        hideDialog(editSongDialog);
+                    }
+                };
+            }
+        });
+        cancelEditBtn.addEventListener('click', () => hideDialog(editSongDialog));
+        confirmCreatePlaylistBtn.addEventListener('click', () => {
+            const name = newPlaylistNameInput.value.trim();
+            if (name) {
+                playlists.push({ name: name, songs: [] });
+                saveState();
+                renderPlaylists();
+                newPlaylistNameInput.value = '';
+                hideDialog(createPlaylistDialog);
+            } else {
+                alert('الرجاء إدخال اسم لقائمة التشغيل.');
+            }
+        });
+        cancelCreatePlaylistBtn.addEventListener('click', () => {
+            newPlaylistNameInput.value = '';
+            hideDialog(createPlaylistDialog);
+        });
         darkModeToggle.addEventListener('change', () => {
             if (darkModeToggle.checked) {
                 document.body.classList.add('dark-mode');
@@ -1278,6 +1593,7 @@
         });
         resetDataBtn.addEventListener('click', () => {
             if (confirm('هل أنت متأكد من مسح جميع البيانات؟ سيتم إعادة تحميل الصفحة.')) {
+                indexedDB.deleteDatabase('musicPlayerDB');
                 localStorage.clear();
                 window.location.reload();
             }
@@ -1292,11 +1608,26 @@
             document.body.classList.add('dark-mode');
             darkModeToggle.checked = true;
         }
-        originalPlaylist = [...playlist];
-        renderPlaylist();
-        renderArtistsAndAlbums();
-        renderPlaylists();
-        updateUI();
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+        async function init() {
+            await openDatabase();
+            await loadSongsFromDB();
+            renderPlaylist();
+            renderArtistsAndAlbums();
+            renderPlaylists();
+            updateUI();
+            setupFileHandling();
+        }
+
+        init();
     </script>
 </body>
 </html>
